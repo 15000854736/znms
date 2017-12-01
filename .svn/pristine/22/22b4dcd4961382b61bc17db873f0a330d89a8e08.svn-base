@@ -1,0 +1,11 @@
+package info.zznet.znms.web.module.apInformation.service;
+
+import info.zznet.znms.base.entity.ApMap;
+import info.zznet.znms.web.module.common.service.BaseService;
+
+public interface ApMapService extends BaseService{
+	
+	ApMap findNewestMap();
+	
+	String getLatestPicture();
+}

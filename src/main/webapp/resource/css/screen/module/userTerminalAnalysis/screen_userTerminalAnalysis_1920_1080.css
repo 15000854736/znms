@@ -1,0 +1,39 @@
+@charset "utf-8";
+/* CSS Document */
+.u_terminal_box{ width:100%;overflow:hidden;  display:inline-block; text-align:center;vertical-align: top;}
+.u_terminal_t{ text-align:center; display:inline-table; width:49%;}
+.u_terminal_t h2{ color:#0ce; font-size:12px; margin:10px 0;}
+.u_terminal_data{ margin:5% 0;}
+.u_terminal_ult li{ display:inline-table; color:#fff; background:url(../../../../images/screen/module/userTerminalAnalysis/u_rensubg.png) repeat top; border-radius:5px; width:15%; font-size:3vw; font-family:impact; margin:0 1px;}
+.u_terminal_box h1{ color:#0ce;font-size: 18px;font-weight: normal;text-align: center; padding: 20px 0 10px 0;}
+.u_terminal_iconbox li{ display:inline-table; margin:0 1%;}
+.u_tericon_a i,.u_tericon_b i,.u_tericon_c i,.u_tericon_d i{ background:url(../../../../images/screen/module/userTerminalAnalysis/u_iconimg.png) no-repeat; width:35px; height:35px;}
+.u_tericon_a i{background-position:0 0;}
+.u_tericon_b i{background-position:-57px 0;}
+.u_tericon_c i{background-position:-130px 0;}
+.u_tericon_d i{background-position:-196px 0;}
+.u_tericon_a p{ color:#0cc;}
+.u_tericon_b p{color:#09c;}
+.u_tericon_c p{color:#6c3;}
+.u_tericon_d p{color:#f93;}
+.u_font_1vw{ font-size:1.2vw;}
+.u_terminal_doughnut{margin-left: 0px;margin-top: -40px;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

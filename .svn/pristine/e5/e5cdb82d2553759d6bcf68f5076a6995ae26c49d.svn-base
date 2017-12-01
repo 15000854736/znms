@@ -1,0 +1,10 @@
+header.li.title.loginTime=\u767B\u5F55\u65F6\u95F4
+header.li.title.modifyPwd=\u4FEE\u6539\u5BC6\u7801
+header.li.title.logout=\u6CE8\u9500
+header.li.title.homePage=\u4E3B\u9875
+header.li.title.loginIp=IP
+header.li.title.about=\u5173\u4E8E
+modifyPwd.input.label.oldPassword=\u539F\u59CB\u5BC6\u7801
+modifyPwd.input.label.newPassword=\u65B0\u5BC6\u7801
+modifyPwd.li.title.modifyPwd=\u4FEE\u6539\u5BC6\u7801
+modifyPwd.input.label.newPasswordAgain=\u518D\u6B21\u786E\u8BA4\u65B0\u5BC6\u7801

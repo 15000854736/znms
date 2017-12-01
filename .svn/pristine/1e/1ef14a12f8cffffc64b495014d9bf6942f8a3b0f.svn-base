@@ -1,0 +1,45 @@
+/**
+ * 
+ */
+package info.zznet.znms.web.module.security.bean;
+
+/**
+ * 首页设备状态bean
+ * @author dell001
+ *
+ */
+public class DeviceStatusBean {
+
+	//设备个数
+	private long count;
+	
+	//对应设备状态百分比
+	private double statusPercent;
+
+	public long getCount() {
+		return count;
+	}
+
+	public void setCount(long count) {
+		this.count = count;
+	}
+
+	public double getStatusPercent() {
+		return statusPercent;
+	}
+
+	public void setStatusPercent(double statusPercent) {
+		this.statusPercent = statusPercent;
+	}
+
+	/**
+	 * @param count
+	 * @param statusPercent
+	 */
+	public DeviceStatusBean(long count, double statusPercent) {
+		super();
+		this.count = count;
+		this.statusPercent = statusPercent;
+	}
+
+}

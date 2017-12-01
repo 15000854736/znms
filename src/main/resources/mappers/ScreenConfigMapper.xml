@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.ScreenConfigMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.ScreenConfig" >
+    <id column="SCREEN_ID" property="screenId" jdbcType="VARCHAR" />
+    <result column="SCREEN_WIDTH" property="screenWidth" jdbcType="INTEGER" />
+    <result column="SCREEN_HEIGHT" property="screenHeight" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    SCREEN_ID, SCREEN_WIDTH, SCREEN_HEIGHT
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from SCREEN_CONFIG
+    where SCREEN_ID = #{screenId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from SCREEN_CONFIG
+    where SCREEN_ID = #{screenId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.ScreenConfig" >
+    insert into SCREEN_CONFIG (SCREEN_ID, SCREEN_WIDTH, SCREEN_HEIGHT
+      )
+    values (#{screenId,jdbcType=VARCHAR}, #{screenWidth,jdbcType=INTEGER}, #{screenHeight,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.ScreenConfig" >
+    insert into SCREEN_CONFIG
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="screenId != null" >
+        SCREEN_ID,
+      </if>
+      <if test="screenWidth != null" >
+        SCREEN_WIDTH,
+      </if>
+      <if test="screenHeight != null" >
+        SCREEN_HEIGHT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="screenId != null" >
+        #{screenId,jdbcType=VARCHAR},
+      </if>
+      <if test="screenWidth != null" >
+        #{screenWidth,jdbcType=INTEGER},
+      </if>
+      <if test="screenHeight != null" >
+        #{screenHeight,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.ScreenConfig" >
+    update SCREEN_CONFIG
+    <set >
+      <if test="screenWidth != null" >
+        SCREEN_WIDTH = #{screenWidth,jdbcType=INTEGER},
+      </if>
+      <if test="screenHeight != null" >
+        SCREEN_HEIGHT = #{screenHeight,jdbcType=INTEGER},
+      </if>
+    </set>
+    where SCREEN_ID = #{screenId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.ScreenConfig" >
+    update SCREEN_CONFIG
+    set SCREEN_WIDTH = #{screenWidth,jdbcType=INTEGER},
+      SCREEN_HEIGHT = #{screenHeight,jdbcType=INTEGER}
+    where SCREEN_ID = #{screenId,jdbcType=VARCHAR}
+  </update>
+</mapper>

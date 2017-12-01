@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.ImportResultMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.ImportResult" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="REGISTER_TIME" property="registerTime" jdbcType="TIMESTAMP" />
+    <result column="FINISH_TIME" property="finishTime" jdbcType="TIMESTAMP" />
+    <result column="RESULT" property="result" jdbcType="BIT" />
+    <result column="ADMIN_NAME" property="adminName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, REGISTER_TIME, FINISH_TIME, RESULT, ADMIN_NAME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from IMPORT_RESULT
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from IMPORT_RESULT
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.ImportResult" >
+    insert into IMPORT_RESULT (ID, REGISTER_TIME, FINISH_TIME, 
+      RESULT, ADMIN_NAME)
+    values (#{id,jdbcType=VARCHAR}, #{registerTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP}, 
+      #{result,jdbcType=BIT}, #{adminName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.ImportResult" >
+    insert into IMPORT_RESULT
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="registerTime != null" >
+        REGISTER_TIME,
+      </if>
+      <if test="finishTime != null" >
+        FINISH_TIME,
+      </if>
+      <if test="result != null" >
+        RESULT,
+      </if>
+      <if test="adminName != null" >
+        ADMIN_NAME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="registerTime != null" >
+        #{registerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null" >
+        #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="result != null" >
+        #{result,jdbcType=BIT},
+      </if>
+      <if test="adminName != null" >
+        #{adminName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.ImportResult" >
+    update IMPORT_RESULT
+    <set >
+      <if test="registerTime != null" >
+        REGISTER_TIME = #{registerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null" >
+        FINISH_TIME = #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="result != null" >
+        RESULT = #{result,jdbcType=BIT},
+      </if>
+      <if test="adminName != null" >
+        ADMIN_NAME = #{adminName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.ImportResult" >
+    update IMPORT_RESULT
+    set REGISTER_TIME = #{registerTime,jdbcType=TIMESTAMP},
+      FINISH_TIME = #{finishTime,jdbcType=TIMESTAMP},
+      RESULT = #{result,jdbcType=BIT},
+      ADMIN_NAME = #{adminName,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="findAll" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from IMPORT_RESULT
+    order by FINISH_TIME desc
+  </select>
+</mapper>

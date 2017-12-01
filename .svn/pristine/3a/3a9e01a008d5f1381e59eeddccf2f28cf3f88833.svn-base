@@ -1,0 +1,574 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: shenqilei
+  Date: 2016/11/30
+  Time: 17:45
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%
+    String path=request.getContextPath();
+%>
+<style>
+line,[opacity='0.15'] {display:none !important;}
+
+</style>
+<script>
+
+
+    //散列系数 1个在线用户散列几个点
+    var countScale = ${countScale};
+    //散列点尺寸
+    var pointSize = ${pointSize};
+
+    var myChart;
+
+    function getStarMapBgScale(){
+        var scale =1;
+
+        var logo_height = ${logoHeight};
+        if(logo_height>50){
+            logo_height=50;
+        }
+
+        var screenWidth  = winWidth;
+        var screenHeight = winHeight-logo_height;
+
+        var starMapWidth = ${starMapBgWidth};
+        var starMapHeight = ${starMapBgHeight};
+
+        var widthScale = screenWidth/starMapWidth;
+        var heightScale = screenHeight/starMapHeight;
+
+        if(widthScale>heightScale){
+            scale = heightScale;
+        }else{
+            scale = widthScale;
+        }
+
+        return scale;
+    }
+
+    //随机散列点
+    function randomPoint(r, ox, oy, count){
+        var data = [];
+        for( i = 0; i < count; i++){
+
+            var x_direction = Math.round(Math.random());
+            var y_direction = Math.round(Math.random());
+
+            var x,y;
+            if(x_direction>0){
+                x = Math.floor(Math.random()*r)+1+ox
+            }else{
+                x = ox-(Math.floor(Math.random()*r)+1);
+            }
+
+            if(y_direction>0){
+                y = Math.floor(Math.random()*r)+1+oy
+            }else{
+                y = oy-(Math.floor(Math.random()*r)+1);
+            }
+            data.unshift({x:x,y:y});
+        }
+        return data;
+    }
+
+    function generatePoint(apData){
+        var data = [];
+
+        for(var i=0;i<apData.length;i++){
+            var x=apData[i].x;
+            var y=apData[i].y;
+            data.push([
+                x,
+                y
+            ]);
+            var random_data = randomPoint(${radius},x,y, Math.round(countScale*apData[i].value));
+            for(var k=0;k<random_data.length;k++) {
+                var xvalue=random_data[k].x;
+                var yvalue=random_data[k].y;
+                data.push([xvalue ,yvalue]);
+            }
+        }
+
+        return data;
+    }
+
+
+    function refreshStarMap() {
+        $.ajax({
+            type:'POST',
+            url:'<%=path%>/screen/module/starMap/getApData',
+            cache:false,
+            success:function(apData){
+
+                var data = generatePoint(apData);
+
+                myChart.setOption({
+                    series : [
+                        {
+                            name:'ap',
+                            type:'scatter',
+                            large: true,
+                            showEffectOn: 'render',
+                            rippleEffect: {
+                                brushType: 'stroke'
+                            },
+                            itemStyle: {
+                                normal: {
+                                    shadowBlur: 10,
+                                    shadowColor: 'rgba(14, 241, 242, 0.8)',
+                                    color: 'rgba(14, 241, 242, 0.8)'
+                                }
+                            },
+                            symbolSize: pointSize,
+                            data:data
+                        }
+                    ]
+                });
+
+
+            }
+        });
+    }
+    function refreshOnlineUser() {
+        $.ajax({
+            type:'POST',
+            url:'<%=path%>/screen/module/starMap/getRightUpAreaData',
+            cache:false,
+            success:function(data){
+            	var totalOnlineUserCount=data[0].totalOnlineUserCount;
+            	var apOnlineCount=data[0].apOnlineCount;
+            	var wirelessUserCount=data[0].wirelessUserCount;
+            	var wireUserCount=data[0].wireUserCount;
+            	var wireless1x=data[0].wireless1X;
+            	var wirelessPortal=data[0].wirelessPortal;
+            	var android=data[0].android;
+            	var ios=data[0].ios;
+            	var pc=data[0].pc;
+            	
+            	//console.log(totalOnlineUserCount +":"+ wirelessUserCount+":"+wireUserCount );
+            	$("#totalOnlineUserCount").html(totalOnlineUserCount);
+            	$("#apOnlineCount").html(apOnlineCount);
+            	
+            	$("#wirelessRatio").html(wirelessUserCount);
+            	$("#wireRatio").html(wireUserCount);
+            	
+            	$("#wireless1x").html(wireless1x);
+            	$("#wirelessPortal").html(wirelessPortal);
+            	
+            	$("#androidRatio").html(android);
+            	$("#iosRatio").html(ios);
+            	$("#pcRatio").html(pc);
+            	terminalRation(data);
+            	wirelessRation(data);
+            }
+        });
+    }
+	
+	
+    /**
+     * 全屏时调用
+     */
+    function showFullScreen_starMap(){
+        console.log("invoke showFullScreen_starMap");
+        //计算背景图缩放比例
+        var scale = getStarMapBgScale();
+        var mapWidth = scale*${starMapBgWidth};
+        var mapHeight = scale*${starMapBgHeight};
+
+
+        $("#star_map").height(mapHeight);
+        $("#star_map").width(mapWidth);
+
+        myChart = echarts.init(document.getElementById("star_map"));
+        //console.log("myChart:"+myChart);
+        $.ajax({
+            type:'POST',
+            url:'<%=path%>/screen/module/starMap/getApData',
+            cache:false,
+            success:function(apData){
+
+                var img = new Image();
+                img.src = "image/SCHOOL-BG.png";
+
+                var canvas = document.createElement("canvas");
+                canvas.width =  mapWidth;
+                canvas.height = mapHeight;
+                var context =canvas.getContext("2d");
+                context.scale(scale,scale);//设置缩放比例
+                context.drawImage(img, 0, 0);
+
+                //坐标点
+                var data = generatePoint(apData);
+
+                var option = {
+                    animation:false,
+                    backgroundColor: {
+                        type: "pattern",
+                        repeat: "no-repeat",
+                        image: canvas,
+                    },
+                    grid: {
+                        x: 0,
+                        y: 0,
+                        x2:mapWidth,
+                        y2:mapHeight,
+                        bottom:0,
+                        left:0,
+                        top:0,
+                        right:0
+                    },
+                    toolbox: {
+                        show : false,
+                        feature : {
+                            mark : {show: true},
+                            dataZoom : {show: true},
+                            dataView : {show: true, readOnly: false},
+                            restore : {show: true},
+                            saveAsImage : {show: true}
+                        }
+                    },
+                    xAxis : [
+                        {
+
+                            min:'0',
+                            max: img.width,
+                            inverse:false,
+                            //axisLabel :false,
+                            axisLine :false,
+                            splitLine :false,
+                            type : 'value',
+                            scale:false
+                        }
+                    ],
+                    yAxis : [
+                        {
+
+                            min:'0',
+                            max: img.height,
+                            inverse:true,
+                            axisLine :false,
+                            splitLine :false,
+                            type : 'value',
+                            scale:false
+                        }
+                    ],
+                    series : [
+                        {
+                            name:'ap',
+                            type:'scatter',
+                            large: true,
+                            showEffectOn: 'render',
+                            rippleEffect: {
+                                brushType: 'stroke'
+                            },
+                            itemStyle: {
+                                normal: {
+                                    shadowBlur: 10,
+                                    shadowColor: 'rgba(14, 241, 242, 0.8)',
+                                    color: 'rgba(14, 241, 242, 0.8)'
+                                }
+                            },
+                            symbolSize: pointSize,
+                            data:data
+                        }
+                    ],
+                    itemStyle: {
+                        normal: {
+                            color: '#0FD6D7'
+                        }
+                    }
+                };
+                myChart.setOption(option);
+				
+				$.ajax({
+            	type:'POST',
+            	url:'<%=path%>/screen/module/starMap/getRightUpAreaData',
+            	cache:false,
+            	success:function(data){
+            		var totalOnlineUserCount=data[0].totalOnlineUserCount;
+            		var apOnlineCount=data[0].apOnlineCount;
+            		var wirelessUserCount=data[0].wirelessUserCount;
+            		var wireUserCount=data[0].wireUserCount;
+            		var wireless1x=data[0].wireless1X;
+            		var wirelessPortal=data[0].wirelessPortal;
+            		var android=data[0].android;
+            		var ios=data[0].ios;
+            		var pc=data[0].pc;
+            	
+            		//console.log(totalOnlineUserCount +":"+ wirelessUserCount+":"+wireUserCount );
+            		$("#totalOnlineUserCount").html(totalOnlineUserCount);
+            		$("#apOnlineCount").html(apOnlineCount);
+            	
+            		$("#wirelessRatio").html(wirelessUserCount);
+            		$("#wireRatio").html(wireUserCount);
+            	
+            		$("#wireless1x").html(wireless1x);
+            		$("#wirelessPortal").html(wirelessPortal);
+            	
+            		$("#androidRatio").html(android);
+            		$("#iosRatio").html(ios);
+            		$("#pcRatio").html(pc);
+            		terminalRation(data) ;
+            		wirelessRation(data);
+            		}
+            	});
+                //设置刷新
+                refreshHander_1 = setInterval(function(){
+                    refreshStarMap();
+                }, 60*1000);
+                
+                refreshHander_2 = setInterval(function(){
+                    refreshOnlineUser();
+                }, 60*1000);
+            }
+        });
+    }
+    
+  	function terminalRation(data) {
+  	  try{
+		var android=data[0].android;
+		var ios=data[0].ios;
+		var pc=data[0].pc;
+		var sum=data[0].android+data[0].ios+data[0].pc;
+		var androidPercent;
+		var iosPercent;
+		var pcPercent;
+		try{
+		androidPercent=android/sum*100;
+		iosPercent=ios/sum*100;
+		pcPercent=pc/sum*100;
+		}catch(err){
+			console.log("计算终端比例错误");
+		}
+		
+		var winWidth  = window.screen.width;
+		var winHeight = window.screen.height;
+		var width;
+		var height;
+		if(winWidth==1920 && winHeight==1080){
+			width='341';
+			height='170';
+		}else if(winWidth==1600 && winHeight==900){
+			width='281';
+			height='117';
+		}else if(winWidth==1366 && winHeight==768){
+			width='255';
+			height='110';
+		}else if(winWidth==1280 && winHeight==1024){
+			width='208';
+			height='180';
+		}
+		
+		var pointData=[];
+		if(ios>0){
+			pointData.push({ x: "IOS", text: iosPercent.toPrecision(3)+"%", y: ios ,fill:'#CDCFDE'}); 
+		}else if(android>0){
+			 pointData.push({ x: "Android", text: androidPercent.toPrecision(3)+"%", y: android  ,fill:'#8DEA0D'}); 
+		}else if(pc>0){
+		 	pointData.push({ x: "PC", text: pcPercent.toPrecision(3)+"%", y: pc  ,fill:'#03BDF6'});
+		}
+			$("#terminalRation").ejChart(
+			{   
+				commonSeriesOptions: 
+				{
+					labelPosition: 'outside',                          
+					tooltip: { visible: true, format: "#point.x# : #point.y#%" },
+					marker: 
+					{
+						dataLabel: 
+						{ 
+							shape: 'none', 
+							visible: true, 
+							textPosition: 'top', 
+							border: { width: 1}, 
+							font :{color : "rgb(246,181,63)",size:"1",fontWeight : "bold"},
+							connectorLine: { height: 20, stroke:"black" } 
+						}
+					}
+				},
+				
+				series: 
+				[
+					{
+						points: pointData, 
+						
+						//explodeIndex: 0,                              
+						border: { width: 2, color: 'white' },
+						type: 'doughnut', 
+						//font :{color : "rgb(140,198,63)",size:"1",fontWeight : "bold"},
+						//labelPosition: 'outside', 
+						startAngle: 100
+					}
+				],
+				
+				//Enabling 3D Chart			
+				enable3D: true,
+				enableRotation:false,
+				//enableRotation: false,	
+				depth: 20,
+				tilt: -50,
+				rotation: -30,
+				perspectiveAngle: 0,                      
+				canResize: true,
+				//load: "onchartload",                      
+				//title:{text:"终端比例"},            
+				size: { height: height, width:width},                     
+				legend: { visible: false }
+			});
+			}catch(err){
+				console.log("终端比例图标加载失败");
+			}
+			
+		}
+	
+	function wirelessRation(data){
+		var wirelessUserCount=data[0].wirelessUserCount;
+        var wireUserCount=data[0].wireUserCount;
+        var winWidth  = window.screen.width;
+		var winHeight = window.screen.height;
+		var width;
+		var height;
+		if(winWidth==1920 && winHeight==1080){
+			width='341';
+			height='177';
+		}else if(winWidth==1600 && winHeight==900){
+			width='261';
+			height='117';
+		}else if(winWidth==1366 && winHeight==768){
+			width='224';
+			height='110';
+		}else if(winWidth==1280 && winHeight==1024){
+			width='208';
+			height='170';
+		}
+        $("#wirelessDiv").ejChart(
+        {
+			//Initializing Primary X Axis	
+            primaryXAxis:
+            {                                
+				//valueType: 'category',
+                //labelFormat:"MMM",
+                //title: { text: "Minerals" },
+             	 visible : false,
+             	 crossesAt: 90,
+                majorGridLines: { visible: true, color: "#BACF25", opacity: 0.1 }
+            },
+			
+			//Initializing Primary Y Axis	
+            primaryYAxis:
+            {         
+             	crossesAt: 1,
+				crossesInAxis: 'secondaryYAxis',
+               	visible : false,
+               //rangePadding : "none" ,
+				majorGridLines: { visible: true, color: "#BACF25", opacity: 0.1}
+            },
+          	
+            
+			//Initializing Common Properties for all the series
+			commonSeriesOptions:
+			{
+              	columnFacet: "cylinder", 
+              
+				//tooltip: { visible: false, format: "#series.name#<br/>#point.x# : #point.y#mg" },                
+                type: "column"     ,
+               dataLabel: 
+				{ 
+					shape: 'none', 
+					visible: true, 
+					textPosition: 'top', 
+                  	font :{color : "rgb(17,93,163)",size:"20",fontWeight : "bold"},
+					border: { width: 1},
+				},
+            },
+             
+			//Initializing Series
+			series: 
+			[                                                                                   
+                {
+                 
+                  points: [{ x: "无线", y: wirelessUserCount,fill:'#9DEA0D'},{ x: "有线", y: wireUserCount,fill:'#E18D0D'}] 
+				  //name: 'Minerals Content in Apple'
+                }                            
+            ],
+			
+			//Enabling 3D Chart
+            enable3D: true,	
+			enableRotation: false,			
+            depth: 100,
+            wallSize: 2,
+            //tilt:20,
+            //rotation: -3,
+            tilt:10,
+            rotation: 0,
+            perspectiveAngle: 90,
+            sideBySideSeriesPlacement: true,
+			//load: "loadTheme",
+            //title: { text: 'Fruits Nutrients' },            
+            isResponsive: false,
+            canResize: true,
+            size: { height: height,width:width},
+            legend: { visible: false, size :{width : "100%"}  }
+        });
+		//$("#sampleProperties").ejPropertiesPanel();
+    }
+</script>
+<div id="star_map_container">
+    <div id="star_map" class="L">
+
+    </div>
+    <table width="0" border="0" cellspacing="0" cellpadding="0" class="sm_star_right_menu">
+        <tr>
+            <td class="sm_width_50b sm_height_15b"  ><div class="sm_adapt_mod sm_fontcol_f60"><i class="sm_online_no"></i><p class="led_fonts sm_font_2vw" id="totalOnlineUserCount"></p><p>在线数</p></div></td>
+            <td class="sm_width_50b"><div class="sm_adapt_mod sm_fontcol_9f0"><i class="sm_online_ap_no"></i><p class="led_fonts sm_font_2vw" id="apOnlineCount"></p><p>AP在线数</p></div></td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sm_height_35b">
+                <h1 class="sm_title_h">有线/无线比例</h1>
+                <ul class="sm_wired_wireless_b">
+   					 <li>
+   					 	<div style="width:5px;float:left">&nbsp;&nbsp;</div>
+   					 	<div class="sm_data_amod"  id="wirelessDiv"></div>
+   					 </li>
+    				 <li style="margin:0 0 0 10%">
+    				 	<div class="sm_adapt_mod_b sm_wired_9f0 L"><i class="sm_wired_no">
+    				 </i>
+    				 	<p class="led_fonts sm_font_2vw" id="wirelessRatio"></p>
+    				 		<p>无线</p>
+    				 	</div>
+    				 	<div class="sm_adapt_mod_b sm_wireless_c90 L">
+    				 		<i class="sm_wireless_no"></i><p class="led_fonts sm_font_2vw" id="wireRatio"></p>
+    				 	<p>有线</p>
+    				 	</div>
+    				 </li>
+      			</ul>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"  class="sm_height_15b">  <ul class="sm_wired_wireless">
+                <li><div class="sm_adapt_mod sm_wired1x_0cf"><i class="sm_wired1x_no"></i><p class="led_fonts sm_font_2vw" id="wireless1x"></p><p>无线1x</p></div></li>
+                <li><div class="sm_adapt_mod sm_portal_ff0"><i class="sm_portal_no"></i><p class="led_fonts sm_font_2vw" id="wirelessPortal"></p><p>无线Portal</p></div></li>
+            </ul></td>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="sm_height_35b">
+                <h1 class="sm_title_h">终端比例</h1>
+                <div class="sm_text_center" id="terminalRation" >
+                	<!--<img src="<%=path%>/images/screen/module/starMap/3.png" width="49%" height="10%" >-->
+                </div>
+                <ul class="sm_wired_wireless sm_terminal">
+                    <li><div class="sm_adapt_mod sm_apple_ccc"><i class="sm_apple_no"></i><p class="led_fonts sm_font_2vw" id="iosRatio"></p><p>苹果</p></div></li>
+                    <li><div class="sm_adapt_mod sm_android_9f0"><i class="sm_android_no"></i><p class="led_fonts sm_font_2vw" id="androidRatio"></p><p>安卓</p></div></li>
+                    <li><div class="sm_adapt_mod sm_pc_0cf"><i class="sm_pc_no"></i><p class="led_fonts sm_font_2vw" id="pcRatio"></p><p>PC</p></div></li>
+                </ul></td>
+        </tr>
+    </table>
+</div>
+
+

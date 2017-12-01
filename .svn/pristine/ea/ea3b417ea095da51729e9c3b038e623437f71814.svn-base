@@ -1,0 +1,126 @@
+package info.zznet.znms.web.module.screen.controller;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import info.zznet.znms.base.common.ZNMSLogger;
+import info.zznet.znms.base.constants.PermissionConstants;
+import info.zznet.znms.base.entity.FlowData;
+import info.zznet.znms.web.WebRuntimeData;
+import info.zznet.znms.web.annotation.CheckPermission;
+import info.zznet.znms.web.module.screen.service.FlowDataService;
+import info.zznet.znms.web.util.ApiClientUtil;
+import info.zznet.znms.web.util.DateJsonValueProcessor;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+@RequestMapping("/screen/module/flowAnalysis")
+public class ScreenFlowAnalysisController {
+	
+	private WebRuntimeData webRuntimeData = WebRuntimeData.instance;
+	
+	@Autowired
+	FlowDataService flowDataService;
+	
+ 	@RequestMapping({"","/"})
+    @CheckPermission(PermissionConstants.P_SCREEN_VIEW)
+    public ModelAndView init(){
+        ModelAndView mav = new ModelAndView("/screen/module/flowAnalysis/index");
+
+        return mav;
+    }
+ 	
+ 	
+ 	@RequestMapping(value = "/getFlowAnalysis", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+ 	@ResponseBody
+ 	public String getFlowAnalysis(){
+ 		try {
+ 			
+			
+			//**********************
+			Map<String, Object> textMap = new HashMap<String, Object>();
+			String zlogFlowResponse=webRuntimeData.getScreenData();
+			JSONObject flowResponse= JSONObject.fromObject(zlogFlowResponse);
+ 			JSONObject teacherFlow=JSONObject.fromObject(JSONObject.fromObject(flowResponse.getString("flow")).get("教师"));
+ 			JSONObject studentFlow=JSONObject.fromObject(JSONObject.fromObject(flowResponse.getString("flow")).get("学生"));
+ 			Map<String, Object> teacherFlowMap = new HashMap<String, Object>();
+ 			Map<String, Object> studentFlowMap = new HashMap<String, Object>();
+ 			if(flowResponse!=null&&!flowResponse.equals("null")){
+ 				teacherFlowMap.put("etcFlowPerDay", teacherFlow.getString("etcFlowPerDay"));
+ 				teacherFlowMap.put("etcFlowPerRecord", teacherFlow.getString("etcFlowPerRecord"));
+ 				teacherFlowMap.put("pcFlowPerDay", teacherFlow.getString("pcFlowPerDay"));
+ 				teacherFlowMap.put("pcFlowPerRecord", teacherFlow.getString("pcFlowPerRecord"));
+ 				teacherFlowMap.put("wirelessFlowPerDay", teacherFlow.getString("wirelessFlowPerDay"));
+ 				teacherFlowMap.put("wirelessFlowPerRecord", teacherFlow.getString("wirelessFlowPerRecord"));
+ 			}
+ 			if(studentFlow!=null&&!studentFlow.equals("null")){
+ 				studentFlowMap.put("etcFlowPerDay", studentFlow.getString("etcFlowPerDay"));
+ 				studentFlowMap.put("etcFlowPerRecord", studentFlow.getString("etcFlowPerRecord"));
+ 				studentFlowMap.put("pcFlowPerDay", studentFlow.getString("pcFlowPerDay"));
+ 				studentFlowMap.put("pcFlowPerRecord", studentFlow.getString("pcFlowPerRecord"));
+ 				studentFlowMap.put("wirelessFlowPerDay", studentFlow.getString("wirelessFlowPerDay"));
+ 				studentFlowMap.put("wirelessFlowPerRecord", studentFlow.getString("wirelessFlowPerRecord"));
+ 			}
+ 			
+ 			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+ 			List<FlowData>  flowDataList= flowDataService.findAll();
+ 			Collections.sort(flowDataList,new DateComparator());
+ 			List timeAxisList=new ArrayList();
+ 			List studentWirelessFlowList=new ArrayList();
+ 			List studentPcFlowList=new ArrayList();
+ 			List teacherFlowList=new ArrayList();
+ 			List teacherPcFlowList=new ArrayList();
+ 			
+ 			for (FlowData flowData : flowDataList) {
+ 				timeAxisList.add(sdf.format(flowData.getRecordDate()));
+ 				studentWirelessFlowList.add(flowData.getStudentWirelessFlow());
+ 				studentPcFlowList.add(flowData.getStudentPcFlow());
+ 				teacherFlowList.add(flowData.getTeacherWirelessFlow());
+ 				teacherPcFlowList.add(flowData.getTeacherPcFlow());
+			}
+			/*JsonConfig config = new JsonConfig();  
+			config.registerJsonValueProcessor(Date.class, new DateJsonValueProcessor("yyyy-MM-dd"));  
+			JSONArray dailyFlows=JSONArray.fromObject(flowDataList,config);*/
+			
+			textMap.put("timeAxisList", timeAxisList);
+			textMap.put("studentWirelessFlowTrend", studentWirelessFlowList);
+			textMap.put("studentPcFlowTrend", studentPcFlowList);
+			textMap.put("teacherFlowTrend", teacherFlowList);
+			textMap.put("teacherPcFlowTrend", teacherPcFlowList);
+			
+ 			textMap.put("teacherFlow", teacherFlowMap);
+ 			textMap.put("studentFlow", studentFlowMap);
+ 			
+			return JSONArray.fromObject(textMap).toString();
+		} catch (Exception e) {
+			ZNMSLogger.error("Failed to get data from zos,"+e.getMessage());
+		}
+ 		return null;
+ 	}
+ 	
+    static class DateComparator implements Comparator {  
+        public int compare(Object object1, Object object2) {
+        	FlowData flowData1 = (FlowData) object1;
+        	FlowData flowData2 = (FlowData) object2;  
+            return flowData1.getRecordDate().compareTo(flowData2.getRecordDate());  
+        }  
+    } 
+}

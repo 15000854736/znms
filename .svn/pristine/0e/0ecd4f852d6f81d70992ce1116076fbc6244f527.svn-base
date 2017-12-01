@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.ScreenMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.Screen" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="CONFIG_DATA" property="configData" jdbcType="VARCHAR" />
+    <result column="ROW" property="row" jdbcType="INTEGER" />
+    <result column="COL" property="col" jdbcType="INTEGER" />
+    <result column="CREATETIME" property="createtime" jdbcType="TIMESTAMP" />
+    <result column="UPDATETIME" property="updatetime" jdbcType="TIMESTAMP" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="info.zznet.znms.base.entity.Screen" extends="BaseResultMap" >
+    <result column="THUMBNAIL" property="thumbnail" jdbcType="LONGVARBINARY" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, CONFIG_DATA, ROW, COL, CREATETIME, UPDATETIME, NAME
+  </sql>
+  <sql id="Blob_Column_List" >
+    THUMBNAIL
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from SCREEN
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from SCREEN
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.Screen" >
+    insert into SCREEN (ID, CONFIG_DATA, ROW, 
+      COL, CREATETIME, UPDATETIME, 
+      NAME, THUMBNAIL)
+    values (#{id,jdbcType=VARCHAR}, #{configData,jdbcType=VARCHAR}, #{row,jdbcType=INTEGER}, 
+      #{col,jdbcType=INTEGER}, #{createtime,jdbcType=TIMESTAMP}, #{updatetime,jdbcType=TIMESTAMP}, 
+      #{name,jdbcType=VARCHAR}, #{thumbnail,jdbcType=LONGVARBINARY})
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.Screen" >
+    insert into SCREEN
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="configData != null" >
+        CONFIG_DATA,
+      </if>
+      <if test="row != null" >
+        ROW,
+      </if>
+      <if test="col != null" >
+        COL,
+      </if>
+      <if test="createtime != null" >
+        CREATETIME,
+      </if>
+      <if test="updatetime != null" >
+        UPDATETIME,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="thumbnail != null" >
+        THUMBNAIL,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="configData != null" >
+        #{configData,jdbcType=VARCHAR},
+      </if>
+      <if test="row != null" >
+        #{row,jdbcType=INTEGER},
+      </if>
+      <if test="col != null" >
+        #{col,jdbcType=INTEGER},
+      </if>
+      <if test="createtime != null" >
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatetime != null" >
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="thumbnail != null" >
+        #{thumbnail,jdbcType=LONGVARBINARY},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.Screen" >
+    update SCREEN
+    <set >
+      <if test="configData != null" >
+        CONFIG_DATA = #{configData,jdbcType=VARCHAR},
+      </if>
+      <if test="row != null" >
+        ROW = #{row,jdbcType=INTEGER},
+      </if>
+      <if test="col != null" >
+        COL = #{col,jdbcType=INTEGER},
+      </if>
+      <if test="createtime != null" >
+        CREATETIME = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatetime != null" >
+        UPDATETIME = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="thumbnail != null" >
+        THUMBNAIL = #{thumbnail,jdbcType=LONGVARBINARY},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="info.zznet.znms.base.entity.Screen" >
+    update SCREEN
+    set CONFIG_DATA = #{configData,jdbcType=VARCHAR},
+      ROW = #{row,jdbcType=INTEGER},
+      COL = #{col,jdbcType=INTEGER},
+      CREATETIME = #{createtime,jdbcType=TIMESTAMP},
+      UPDATETIME = #{updatetime,jdbcType=TIMESTAMP},
+      NAME = #{name,jdbcType=VARCHAR},
+      THUMBNAIL = #{thumbnail,jdbcType=LONGVARBINARY}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.Screen" >
+    update SCREEN
+    set CONFIG_DATA = #{configData,jdbcType=VARCHAR},
+      ROW = #{row,jdbcType=INTEGER},
+      COL = #{col,jdbcType=INTEGER},
+      CREATETIME = #{createtime,jdbcType=TIMESTAMP},
+      UPDATETIME = #{updatetime,jdbcType=TIMESTAMP},
+      NAME = #{name,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -1,0 +1,66 @@
+@charset "utf-8";
+/* CSS Document */
+
+.sm_width_80b{ width:80%; height:95%; margin:1%; position:absolute; }
+.sm_star_right_menu{ position:absolute; right:0; z-index:999; width:17%; height:100%;float:right; border-collapse:separate; border-spacing:10px; }
+.sm_star_right_menu td{ background:rgba(0,246,246,0.1); vertical-align:middle;}
+.sm_width_50b{ width:50%;}
+.sm_height_15b{ height:15%;}
+
+.sm_adapt_mod{   width:90%; height:60%; margin:0 auto; text-align:center}
+.sm_adapt_mod i{ width:50px; height:50px;}
+/* 设置了浏览器小于768px时  */
+@media screen and (max-height:768px) {
+    .sm_adapt_mod i{ width:35px; height:35px;}
+    .sm_star_right_menu{ width:19%; height:100%;float:right; border-collapse:separate; border-spacing:10px; }
+}
+
+.sm_online_no{ background: url(../../../../images/screen/module/starMap/img_a.png) no-repeat  top /auto 100%;}
+.sm_fontcol_f60{ color:#fc0;}
+.sm_font_2vw{ font-size:1.5vw;}
+
+.sm_fontcol_9f0{ color:#9f0;}
+.sm_online_ap_no{ background: url(../../../../images/screen/module/starMap/img_c.png) no-repeat  top /auto 100%;}
+.sm_title_h{ font-size:0.5vw; color:#0cf; font-weight:normal; text-align:center; margin:1% 0;}
+.sm_height_35b{ height:35%;}
+.sm_wired_wireless{ text-align:center;}
+.sm_wired_wireless li{ width:49%;  display: inline-table;  }
+.sm_wired_9f0{color:#9f0;}
+.sm_wireless_c90{color:#c90;}
+.sm_wired_no{ background: url(../../../../images/screen/module/starMap/img_b.png) no-repeat  top /auto 100%;}
+.sm_wireless_no{ background: url(../../../../images/screen/module/starMap/img_d.png) no-repeat  top /auto 100%;}
+.sm_wired1x_no{ background: url(../../../../images/screen/module/starMap/img_h.png) no-repeat  top /auto 100%;}
+.sm_portal_no{ background: url(../../../../images/screen/module/starMap/img_i.png) no-repeat  top /auto 100%;}
+.sm_wired1x_0cf{color:#0cf;}
+.sm_portal_ff0{color:#ff0;}
+
+.sm_terminal li{ width:29%; }
+.sm_text_center{ text-align:center;}
+
+.sm_apple_ccc{color:#ccc;}
+.sm_apple_no{background: url(../../../../images/screen/module/starMap/img_e.png) no-repeat  top /auto 100%;}
+.sm_android_9f0{color:#9f0}
+.sm_android_no{background: url(../../../../images/screen/module/starMap/img_f.png) no-repeat  top /auto 100%;}
+.sm_pc_0cf{color:#0cf;}
+.sm_pc_no{background: url(../../../../images/screen/module/starMap/img_g.png) no-repeat  top /auto 100%;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.SystemLogStatisticsMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.SystemLogStatistics" >
+    <id column="FACILITY_ID" property="facilityId" jdbcType="INTEGER" />
+    <id column="HOST_ID" property="hostId" jdbcType="VARCHAR" />
+    <id column="INSERT_TIME" property="insertTime" jdbcType="TIMESTAMP" />
+    <id column="PRIORITY_ID" property="priorityId" jdbcType="INTEGER" />
+    <result column="RECORDS" property="records" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    FACILITY_ID, HOST_ID, INSERT_TIME, PRIORITY_ID, RECORDS
+  </sql>
+  
+  <select id="findPieData" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from SYSTEM_LOG_STATISTICS
+		<where> 
+			1 = 1
+			<if test="id != null and id != -1 and type ==1">
+				<![CDATA[AND PRIORITY_ID = #{id,jdbcType=INTEGER}]]> 
+		 	</if>
+		 	<if test="id != null and id != -1 and type ==2">
+				<![CDATA[AND FACILITY_ID = #{id,jdbcType=INTEGER}]]> 
+		 	</if>
+		 	<if test="hostId != null and hostId != '-1'">
+				<![CDATA[AND HOST_ID = #{hostId,jdbcType=VARCHAR}]]> 
+		 	</if>
+		 	<if test="insertTimeFrom != null and insertTimeFrom !=''">
+				AND INSERT_TIME  <![CDATA[ >= ]]> #{insertTimeFrom,jdbcType=VARCHAR} 
+		 	</if>
+		 	<if test="insertTimeTo != null and insertTimeTo !=''">
+				AND INSERT_TIME  <![CDATA[ <= ]]> #{insertTimeTo,jdbcType=VARCHAR} 
+		 	</if>
+		</where>
+  </select>
+  
+  <select id="findLineData" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from SYSTEM_LOG_STATISTICS
+		where <![CDATA[DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(INSERT_TIME)]]> 
+		<if test="priorityId != null and priorityId != -1">
+			<![CDATA[AND PRIORITY_ID = #{priorityId,jdbcType=INTEGER}]]> 
+	 	</if>
+	 	<if test="facilityId != null and facilityId != -1">
+			<![CDATA[AND FACILITY_ID = #{facilityId,jdbcType=INTEGER}]]> 
+	 	</if>
+	 	<if test="hostId != null and hostId != '-1'">
+			<![CDATA[AND HOST_ID = #{hostId,jdbcType=VARCHAR}]]> 
+	 	</if>
+	 	order by INSERT_TIME 
+  </select>
+
+  
+  
+</mapper>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.SmAdminMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.SmAdmin" >
+    <id column="ADMIN_UUID" property="adminUuid" jdbcType="VARCHAR" />
+    <result column="ADMIN_ID" property="adminId" jdbcType="VARCHAR" />
+    <result column="ADMIN_NAME" property="adminName" jdbcType="VARCHAR" />
+    <result column="ADMIN_PWD" property="adminPwd" jdbcType="VARCHAR" />
+    <result column="CONTACT_NUMBER" property="contactNumber" jdbcType="VARCHAR" />
+    <result column="ROLE_UUID" property="roleUuid" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_ADMIN" property="createAdmin" jdbcType="VARCHAR" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_ADMIN" property="updateAdmin" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="DetailResultMap" type="info.zznet.znms.web.module.system.bean.SmAdminBean" >
+    <id column="ADMIN_UUID" property="adminUuid" jdbcType="VARCHAR" />
+    <result column="ADMIN_ID" property="adminId" jdbcType="VARCHAR" />
+    <result column="ADMIN_NAME" property="adminName" jdbcType="VARCHAR" />
+    <result column="ADMIN_PWD" property="adminPwd" jdbcType="VARCHAR" />
+    <result column="CONTACT_NUMBER" property="contactNumber" jdbcType="VARCHAR" />
+    <result column="ROLE_UUID" property="roleUuid" jdbcType="VARCHAR" />
+    <result column="ROLE_NAME" property="roleName" jdbcType="VARCHAR"/>
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_ADMIN" property="createAdmin" jdbcType="VARCHAR" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_ADMIN" property="updateAdmin" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    ADMIN_UUID, ADMIN_ID, ADMIN_NAME,ADMIN_PWD, CONTACT_NUMBER, ROLE_UUID, CREATE_TIME, CREATE_ADMIN, 
+    UPDATE_TIME, UPDATE_ADMIN, STATUS
+  </sql>
+  <select id="findByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    SELECT 
+    <include refid="Base_Column_List" />
+    FROM SM_ADMIN
+    WHERE ADMIN_UUID = #{adminUuid,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    DELETE FROM SM_ADMIN
+    WHERE ADMIN_UUID = #{adminUuid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.SmAdmin" >
+  	<selectKey resultType="String" order="BEFORE" keyProperty="adminUuid">
+		SELECT replace(uuid(), '-', '') AS adminUuid
+	</selectKey>
+    INSERT INTO SM_ADMIN (ADMIN_UUID, ADMIN_ID, ADMIN_NAME, 
+      CONTACT_NUMBER, ROLE_UUID, CREATE_TIME, 
+      CREATE_ADMIN, UPDATE_TIME, UPDATE_ADMIN, 
+      STATUS, ADMIN_PWD)
+    VALUES (#{adminUuid,jdbcType=VARCHAR}, #{adminId,jdbcType=VARCHAR}, #{adminName,jdbcType=VARCHAR}, 
+      #{contactNumber,jdbcType=VARCHAR}, #{roleUuid,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createAdmin,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{updateAdmin,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{adminPwd,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.SmAdmin" >
+    INSERT INTO SM_ADMIN
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="adminUuid != null" >
+        ADMIN_UUID,
+      </if>
+      <if test="adminId != null" >
+        ADMIN_ID,
+      </if>
+      <if test="adminName != null" >
+        ADMIN_NAME,
+      </if>
+      <if test="contactNumber != null" >
+        CONTACT_NUMBER,
+      </if>
+      <if test="roleUuid != null" >
+        ROLE_UUID,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+      <if test="createAdmin != null" >
+        CREATE_ADMIN,
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME,
+      </if>
+      <if test="updateAdmin != null" >
+        UPDATE_ADMIN,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="adminUuid != null" >
+        #{adminUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="adminId != null" >
+        #{adminId,jdbcType=VARCHAR},
+      </if>
+      <if test="adminName != null" >
+        #{adminName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactNumber != null" >
+        #{contactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="roleUuid != null" >
+        #{roleUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createAdmin != null" >
+        #{createAdmin,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateAdmin != null" >
+        #{updateAdmin,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.SmAdmin" >
+    UPDATE SM_ADMIN
+    <set >
+      <if test="adminId != null" >
+        ADMIN_ID = #{adminId,jdbcType=VARCHAR},
+      </if>
+      <if test="adminName != null" >
+        ADMIN_NAME = #{adminName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactNumber != null" >
+        CONTACT_NUMBER = #{contactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="roleUuid != null" >
+        ROLE_UUID = #{roleUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createAdmin != null" >
+        CREATE_ADMIN = #{createAdmin,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateAdmin != null" >
+        UPDATE_ADMIN = #{updateAdmin,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=INTEGER},
+      </if>
+    </set>
+    WHERE ADMIN_UUID = #{adminUuid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.SmAdmin" >
+    UPDATE SM_ADMIN
+    SET ADMIN_ID = #{adminId,jdbcType=VARCHAR},
+      ADMIN_PWD = #{adminPwd,jdbcType=VARCHAR},
+      ADMIN_NAME = #{adminName,jdbcType=VARCHAR},
+      CONTACT_NUMBER = #{contactNumber,jdbcType=VARCHAR},
+      ROLE_UUID = #{roleUuid,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      CREATE_ADMIN = #{createAdmin,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      UPDATE_ADMIN = #{updateAdmin,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=INTEGER}
+    WHERE ADMIN_UUID = #{adminUuid,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="findByAdminId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    SELECT 
+    <include refid="Base_Column_List" />
+    FROM SM_ADMIN
+    WHERE ADMIN_ID = #{adminId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findAdminInfos" resultMap="DetailResultMap"  parameterType="info.zznet.znms.web.module.system.bean.SmAdminBean">
+    SELECT 
+    t1.ADMIN_UUID, t1.ADMIN_ID, t1.ADMIN_NAME,t1.ADMIN_PWD, t1.CONTACT_NUMBER, t1.ROLE_UUID, t1.CREATE_TIME, t1.CREATE_ADMIN, 
+    t1.UPDATE_TIME, t1.UPDATE_ADMIN, t1.STATUS,t2.ROLE_NAME
+    from SM_ADMIN t1 left join SM_ROLE t2 on t1.ROLE_UUID = t2.ROLE_UUID
+    <where>  
+       <if test="adminId != null">  
+       <bind name="adminId" value="'%' + _parameter.adminId + '%'" />
+           t1.ADMIN_ID like #{adminId}  
+       </if> 
+       <if test="adminName != null"> 
+       <bind name="adminName" value="'%' + _parameter.adminName + '%'" /> 
+           AND t1.ADMIN_NAME like #{adminName,jdbcType=VARCHAR}  
+       </if>
+       <if test="roleUuid != null">  
+           AND t2.ROLE_UUID = #{roleUuid,jdbcType=VARCHAR}  
+       </if>
+	</where> 
+  </select>
+  <select id="count" resultType="java.lang.Integer"   parameterType="info.zznet.znms.web.module.system.bean.SmAdminBean">
+    SELECT COUNT(1)
+    FROM SM_ADMIN t1 LEFT JOIN SM_ROLE t2 ON t1.ROLE_UUID = t2.ROLE_UUID
+    <where>  
+       <if test="adminId != null">  
+       <bind name="adminId" value="'%' + _parameter.adminId + '%'" />
+           t1.ADMIN_ID like #{adminId}  
+       </if> 
+       <if test="adminName != null"> 
+       <bind name="adminName" value="'%' + _parameter.adminName + '%'" /> 
+           AND t1.ADMIN_NAME like #{adminName,jdbcType=VARCHAR}  
+       </if>
+       <if test="roleUuid != null">  
+           AND t2.ROLE_UUID = #{roleUuid,jdbcType=VARCHAR}  
+       </if>
+	</where> 
+  </select>
+  
+  <delete id="deleteByUuidList" parameterType="java.util.List">
+		DELETE FROM SM_ADMIN WHERE 
+		<![CDATA[ADMIN_ID <> 'admin']]>
+		and ADMIN_UUID IN
+		<foreach collection="list" index="index" item="id" open="("
+			separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>

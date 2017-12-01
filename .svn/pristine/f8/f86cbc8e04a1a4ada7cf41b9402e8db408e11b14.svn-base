@@ -1,0 +1,192 @@
+@charset "utf-8";
+/* CSS Document */
+*{ margin:0; padding:0;}
+img{ border:none;}
+li{ list-style:none;}
+i{background-repeat:no-repeat; display:inline-block; vertical-align:middle;}
+@font-face{ font-family: 'ds-digitalbold';src:url('../fonts/ds-digib-webfont.woff2') format('woff2'),url('../fonts/ds-digib-webfont.woff') format('woff');font-weight: normal;font-style: normal;}
+.led_fonts {font-family: 'ds-digitalbold';}
+body{ font-family:\5FAE\8F6F\96C5\9ED1; color:#0cf;}
+.online_turntable_1{
+			-webkit-animation-name: spin; 
+			-webkit-animation-duration:20000ms; /* 40 seconds */
+			-webkit-animation-iteration-count: infinite; 
+			-webkit-animation-timing-function: linear;
+			
+			-moz-animation-name: spin; 
+			-moz-animation-duration:20000ms; /* 40 seconds */
+			-moz-animation-iteration-count: infinite; 
+			-moz-animation-timing-function: linear;
+			
+			-ms-animation-name: spin; 
+			-ms-animation-duration:20000ms; /* 40 seconds */
+			-ms-animation-iteration-count: infinite; 
+			-ms-animation-timing-function: linear;
+			/* boooo opera */
+			-o-transition: rotate(3600deg); /* works */
+}
+@-webkit-keyframes spin {from {-webkit-transform: rotate(0deg);}to {-webkit-transform: rotate(360deg);}}
+@-moz-keyframes spin {from {-moz-transform: rotate(0deg);}to {-moz-transform: rotate(360deg);}}
+@-ms-keyframes spin {from {-ms-transform: rotate(0deg);}to {-ms-transform: rotate(360deg);}}
+
+
+
+.network_health_imgbg{
+			-webkit-animation-name: spin; 
+			-webkit-animation-duration:2000ms; /* 40 seconds */
+			-webkit-animation-iteration-count: infinite; 
+			-webkit-animation-timing-function: linear;
+			
+			-moz-animation-name: spin; 
+			-moz-animation-duration:2000ms; /* 40 seconds */
+			-moz-animation-iteration-count: infinite; 
+			-moz-animation-timing-function: linear;
+			
+			-ms-animation-name: spin; 
+			-ms-animation-duration:2000ms; /* 40 seconds */
+			-ms-animation-iteration-count: infinite; 
+			-ms-animation-timing-function: linear;
+			/* boooo opera */
+			-o-transition: rotate(3600deg); /* works */
+}
+@-webkit-keyframes spin {from {-webkit-transform: rotate(0deg);}to {-webkit-transform: rotate(360deg);}}
+@-moz-keyframes spin {from {-moz-transform: rotate(0deg);}to {-moz-transform: rotate(360deg);}}
+@-ms-keyframes spin {from {-ms-transform: rotate(0deg);}to {-ms-transform: rotate(360deg);}}
+
+
+
+.online_people_circle{font-family:ds-digitalbold;}
+.online_turntable_3{
+			-webkit-animation-name: spinb; 
+			-webkit-animation-duration:20000ms; /* 40 seconds */
+			-webkit-animation-iteration-count: infinite; 
+			-webkit-animation-timing-function: linear;
+			
+			-moz-animation-name: spinb; 
+			-moz-animation-duration:20000ms; /* 40 seconds */
+			-moz-animation-iteration-count: infinite; 
+			-moz-animation-timing-function: linear;
+			
+			-ms-animation-name: spinb; 
+			-ms-animation-duration:20000ms; /* 40 seconds */
+			-ms-animation-iteration-count: infinite; 
+			-ms-animation-timing-function: linear;
+			/* boooo opera */
+			-o-transition: rotate(3600deg); /* works */
+}
+@-webkit-keyframes spinb {from {-webkit-transform: rotate(360deg);}to {-webkit-transform: rotate(0deg);}}
+@-moz-keyframes spinb {from {-moz-transform: rotate(360deg);}to {-moz-transform: rotate(0deg);}}
+@-ms-keyframes spinb {from {-ms-transform: rotate(360deg);}to {-ms-transform: rotate(0deg);}}
+
+	
+.prj_logo{ text-align:center;}
+.prj_top{ clear:both; }
+.line_box{ float:left; background: url(../images/background_dec.png) no-repeat;background-size:contain;}
+.line_bottom{ width:100%; background:url(../images/bottom_bg.png) no-repeat;background-size:contain;}
+
+.online_box{ float:left;}
+.online_turntabl_box{display:inline-table; text-align:center; position:relative;}
+.online_turntabl_box p{color:#0cf;fill: #0cf;}
+.online_turntabl_box h1{ font-weight:normal; }
+.online_turntable_1,.online_turntable_2,.online_turntable_3{ position:absolute;}
+.online_turntable_1{background:url(../images/onlineimg1.png) no-repeat;background-size:contain;}
+.online_turntable_2{background:url(../images/onlineimg2.png) no-repeat;}
+.online_turntable_3{background:url(../images/onlineimg3.png) no-repeat;}
+
+.online_people{float:right; }
+.online_people li{ display:inline-table; text-align:center;overflow:hidden; position:relative; color:#fff; }
+.numbe_a,.active_b,.free_c,.scour_d{ position:absolute; bottom:0;  }
+.numbe_a{ background:#06c;}
+.active_b{background:#39c;}
+.free_c{background:#3c3;}
+.scour_d{background:#f93;}
+
+.online_devices{ width:100%;display:inline-table; text-align:center; }
+.online_devices li{display:inline-table; text-align:left; }
+.online_devices li i{ background-image:url(../images/prj_iconimg.png); float:left;}
+.online_devices li span{float:right; font-weight:bold;}
+.mobile_devices{ border:1px solid #f33; color:#f33;}
+.wireless_devices{border:1px solid #fc0;color:#fc0;}
+.wired_devices{border:1px solid #0cf;color:#0cf;}
+.other_devices{border:1px solid #3f6;color:#3f6;}
+
+.diagram_box{float:left;text-align:center;}
+
+.network_health{  text-align:center; color:#6f0; float:left; background:url(../images/qp_yuanpan_b.png) no-repeat;background-size:contain; position:relative;}
+.network_health_imgbg{ position:absolute; height:100%;width:100%;top:0; left:0; background:url(../images/qp_yuanpan.png)  no-repeat;background-size:contain;z-index:0;}
+.network_health h1{ font-weight:normal; }
+
+.export_utilization{ float:left;text-align:center; }
+.export_utilization dt{ font-weight:normal;}
+.traffic_data ul li h2{ font-weight:normal;}
+.traffic_data li{ display:inline-table; text-align:center;}
+.traffic_data li p{ color:#cf0;}
+
+.zlog_box{ display:inline-block;vertical-align:top;}
+.zlog_box h1{ font-weight:normal; text-align:center; }
+.zlog_data_a{ float: left; text-align:center; }
+.zlog_data_b{ clear:both;}
+.zlog_data_b li{ display:inline-table; text-align:center; }
+.zlogdata_num{ float:right;}
+.zlogdata_url{ float:left;}
+.zlog_data_list{ float:left;}
+.zlog_data_list li{ position:relative; }
+.data_img_box{ width:100%;background:#669; position:absolute; bottom:0;}
+.percentage_box{ position:absolute; z-index:999;}
+.warn_1{ background:#3cc}.font_warn_1{ color:#fff;}
+.warn_2{ background: #390;}
+.warn_3{ background: #f90;}
+.warn_4{ background: #C03;}
+.warn_5{ background: #f60;}
+.warn_6{ background: #939;}
+.warn_7{ background: #09f;}
+.warn_8{ background: #F93;}
+.warn_9{ background: #f20;}
+.warn_10{ background: #0C0;}
+
+.pre_menu_box{ background:#09c; }
+.pre_menu_box a{color:#fff; text-decoration:none;  display:block;}
+.pre_menu_box a:hover{ background:#049;}
+.pre_menu_box li{display:inline-table;}
+
+.card-holder { position: fixed; overflow: visible;z-index:9999; }
+.card-wrapper {display: inline-block; float: left;clear: both;}
+.card {  position: relative;transition: all 0.3s ease-in-out 0.1s;opacity:0.5; }
+.card:hover {transition: all 0.3s ease-in-out; opacity:1 !important;}
+
+.doughnut_container {	position: relative;}
+.doughnut_container svg {position: absolute;}
+#url_ranking {position: relative;}
+#url_ranking svg {position: absolute;}
+#left_down {	height: 100%;display: inline-block;}
+.heatmap-canvas {width: 100%;height: 100%;}
+#full_screen{	padding:0;margin:0;height:100%;width:100%;display:none;}
+#heat_map{height:100%;width:100%;}
+
+.zlog_title{position:absolute;left:0px;text-align:center;width:100%;font-size:14px;}
+.zlog_title>span{font-size:18px;color:#cf0;vertical-align:top;}
+
+.prj_top1{ height:1080px;}
+.network_health1{  text-align:center; color:#6f0; float:left; background:url(../images/qp_yuanpan_b.png) no-repeat;background-size:contain; position:relative;}
+.network_health_imgbg1{ position:absolute; height:100%;width:100%;top:0; left:0; background:url(../images/qp_yuanpan.png)  no-repeat;background-size:contain;z-index:0;}
+.network_health1 h1{ font-weight:normal; }
+.network_health_imgbg1{
+			-webkit-animation-name: spin; 
+			-webkit-animation-duration:2000ms; /* 40 seconds */
+			-webkit-animation-iteration-count: infinite; 
+			-webkit-animation-timing-function: linear;
+			
+			-moz-animation-name: spin; 
+			-moz-animation-duration:2000ms; /* 40 seconds */
+			-moz-animation-iteration-count: infinite; 
+			-moz-animation-timing-function: linear;
+			
+			-ms-animation-name: spin; 
+			-ms-animation-duration:2000ms; /* 40 seconds */
+			-ms-animation-iteration-count: infinite; 
+			-ms-animation-timing-function: linear;
+			/* boooo opera */
+			-o-transition: rotate(3600deg); /* works */
+}
+
+

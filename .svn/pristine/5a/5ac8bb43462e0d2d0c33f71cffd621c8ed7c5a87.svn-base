@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.ScreenMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.Screen" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="ROW" property="row" jdbcType="INTEGER" />
+    <result column="COL" property="col" jdbcType="INTEGER" />
+    <result column="CONFIG_DATA" property="configData" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, ROW,COL,CONFIG_DATA
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from SCREEN
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from SCREEN
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.Screen" >
+    insert into SCREEN (ID, ROW,COL,CONFIG_DATA
+      )
+    values (#{id,jdbcType=VARCHAR},#{row,jdbcType=INTEGER}, #{col,jdbcType=INTEGER}, 
+    		#{configData,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.Screen" >
+    insert into SCREEN
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="row != null" >
+        ROW,
+      </if>
+      <if test="col != null" >
+        COL,
+      </if>
+      <if test="configData != null" >
+        CONFIG_DATA,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="row != null" >
+        #{row,jdbcType=INTEGER},
+      </if>
+      <if test="col != null" >
+        #{col,jdbcType=INTEGER},
+      </if>
+      <if test="configData != null" >
+        #{configData,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.Screen" >
+    update SCREEN
+    <set >
+      <if test="row != null" >
+        ROW = #{row,jdbcType=INTEGER},
+      </if>
+      <if test="col != null" >
+        COL = #{col,jdbcType=INTEGER},
+      </if>
+      <if test="configData != null" >
+        CONFIG_DATA = #{configData,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.Screen" >
+    update SCREEN
+    set 
+      ROW = #{row,jdbcType=INTEGER},
+      COL = #{col,jdbcType=INTEGER},
+      CONFIG_DATA = #{configData,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

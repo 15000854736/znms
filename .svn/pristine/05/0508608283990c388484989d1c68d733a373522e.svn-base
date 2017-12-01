@@ -1,0 +1,39 @@
+package info.zznet.znms.base.dao;
+
+import java.util.List;
+
+import info.zznet.znms.base.entity.ApMap;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+@Repository("apMapMapper")
+public interface ApMapMapper extends BaseMapper{
+    int deleteByPrimaryKey(String apMapUuid);
+
+    int insert(ApMap record);
+
+    int insertSelective(ApMap record);
+
+    ApMap selectByPrimaryKey(String apMapUuid);
+
+    int updateByPrimaryKeySelective(ApMap record);
+
+    int updateByPrimaryKey(ApMap record);
+
+	/**
+	 * @param apMapName
+	 * @return
+	 */
+	ApMap findByApMapName(@Param("apMapName")String apMapName);
+
+	/**
+	 * @return
+	 */
+	List<ApMap> findAll();
+
+	/**
+	 * @return
+	 */
+	ApMap findNewestMap();
+}

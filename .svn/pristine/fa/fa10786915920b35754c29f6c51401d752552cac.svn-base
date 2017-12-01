@@ -1,0 +1,88 @@
+/* 菜单相关*/
+.nms_left{
+    width: 120px;
+}
+.nms_menu_box .nms_menu_a li{
+    padding:0 0 0 10px;
+}
+.nms_menu_b{
+    padding:0 0 10px 15px;
+}
+/*内容框*/
+.nms_box{
+    margin: 0 0 0 120px;
+}
+/*标题*/
+.indexwrong_box{
+    margin:5px 5px 0px 5px;
+}
+
+/*出口流量*/
+.export_utilization{
+    height:500px;
+    width:200px;
+    margin: 0 5px;
+    float:left;
+}
+#exportFlow{
+    width:700px;
+    height: 500px;
+}
+.exportPlate{
+    width:200px;
+    height:200px;
+}
+.exportLine{
+    width:200px;
+    height:150px;
+}
+
+.znms_sbimg_icon img{
+    margin: 0px;
+    width:60px;
+}
+
+
+
+/*上下行流量*/
+.traffic_data{
+    margin-top: -20px;
+    margin-bottom: 10px;
+}
+.traffic_data li{
+    margin: 0 0px !important;
+}
+.traffic_data ul li h2{
+    padding: 5px 0px;
+    font-size: 10px;
+}
+
+
+/*网络监控*/
+#marquee1{
+    width:700px;
+    height: 230px;
+}
+.index_monitor_box .net_monitor_mod{
+    width: 180px;
+    height: 220px;
+    margin: 10px;
+}
+
+/*在线用户*/
+.nms_data_statistics{
+    height: 300px !important;
+    width: 400px !important;
+    margin-top: -40px;
+}
+.online_user_sort li{
+    margin: 20px 0px;
+}
+.online_user_boxb{
+    margin: 20px 0 0 0;
+}
+
+/*设备统计*/
+.sta_top ul li{
+    padding: 0px;
+}

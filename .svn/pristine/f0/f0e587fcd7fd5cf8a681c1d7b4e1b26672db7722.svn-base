@@ -1,0 +1,354 @@
+package info.zznet.znms.softdog;
+import info.zznet.znms.web.util.SystemUtil;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.crypto.Cipher;
+
+import org.apache.commons.codec.binary.Base64;
+
+/**
+ * 
+ * RSA公钥/私钥/签名工具包
+ * 字符串格式的密钥在未在特殊说明情况下都为BASE64编码格式
+ * 由于非对称加密速度极其缓慢，一般文件不使用它来加密而是使用对称加密
+ * 非对称加密算法可以用来对对称加密的密钥加密，这样保证密钥的安全也就保证了数据的安全
+ *
+ */
+public class DogRsaUtil {
+
+    /**
+     * 加密算法RSA
+     */
+    public static final String KEY_ALGORITHM = "RSA";
+    
+    /**
+     * 签名算法
+     */
+    public static final String SIGNATURE_ALGORITHM = "MD5withRSA";
+
+    /**
+     * 公钥的key
+     */
+//    public static final String PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDWbLzvIiYC/kfFBnSIy6TnVNo39HbKW2FsSTVuXPVwJEczp2rgBcn2joQgNQpQtjn9Pselo5yyo8/ZmWSlg7jGFp4/79LR77kHKRz5RLC3tnBJ1vH60MCCGwdHmnCFU+r4l/7iRLaGNLVqDUl7eT3oJ8gIbqEoRoaoFEBOl1DPfQIDAQAB";
+    public static final String PUBLIC_KEY =   "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDLLEPa8x1/VBYVSTU62Jc7JMBQzJpxmzWm2PWgLSVkicxaP2R2Ex9utDMC5WqsxMv+UK0TTbt/Y+7L+tMbdreHrvYqUSVsJEq5yGpB1Qfz+TXoS6ExKZbP+I3lxpuWyqJL4GCplLg6qJ2CZTSJLZB85MprqSiDJA+Loj9Jp4J3UQIDAQAB";
+    
+    /**
+     * 私钥的key
+     */
+    public static final String PRIVATE_KEY = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAI3j6SgqQitwliwdK5193QhPvsekHHgqb7qi2jg33aBYCnpENS7EnRGObHb7IzKHwADNiEU3Hxa6yRKX1/h/qNdac40fdVH70OWP7u0PnazCSBmJY6+ELiAoWl5ptFeCq1UbG3SYYTNmUlJNiEEkXnwqCa3rJwMHCqcyCu7vCrXNAgMBAAECgYAjAjrC6DpPUYYb+E6Mm0NwC4z84ScNFxteJ1RETrRmHZLoO/ALTAOdE1D7wlca3penGw8mVMVc7FU0OzbUX1se9+ysMk2oVLcRsd6k/9LD7hNwt94Fis2y5b+8mSIPwF3KpCRa6RWStC+Vwu2uT59HLpbtqEjJuTPjDlSmvTBHwQJBAOO/if/TnICwxl0hqt2DFjfjd9cAGS4dWhsgRQamWQpVj6VT3b46nmnZzll5LwlWC8htD/Bww9hThUcN1s54s3UCQQCffdV7HCxvY0YZHgTCz2QWUwu3qkUK8Juxzd4ZVNfVbuVw+5Bu7iER1s92fW4poumvwXg3mAolaZWU3kzhm2X5AkEAy87kl+Ou8hs/6KfwWDqu72TIIcccwX/S2uON4d2LYQwgeDsM/OdITEF1v+wKg7hU4w92bBz9peFYK7XevPaW4QJAfqUlB4Tvo+Nonjk//pFAIJoBC+6gtHcqqp2WZvcAC/LrLjQUFIHysH+qbaRb/aPnfDBcjYilRd/5byS2V89VwQJAMSnFD6w+qsU6dBDyrn+OX3T+6f4waQwk2p1wFZ9Z8swpKFphu09Zf5fQPVV+NEahk6pVdnQ90qx5iDQBJJyFiA==";
+    //public static final String PRIVATE_KEY = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAMssQ9rzHX9UFhVJNTrYlzskwFDMmnGbNabY9aAtJWSJzFo/ZHYTH260MwLlaqzEy/5QrRNNu39j7sv60xt2t4eu9ipRJWwkSrnIakHVB/P5NehLoTEpls/4jeXGm5bKokvgYKmUuDqonYJlNIktkHzkymupKIMkD4uiP0mngndRAgMBAAECgYAxJXMAiqCPBVsWKRBMPMpQTzKKGQQfCQlwY7j+1wzdhgu9pOn7OeL3l3VjdPVZ93zU9tT2/22kghrokrLwSMZaCGGzl1lW3uaQ8zEIIxpwl8XuTIQDR1MiJGL0Gi93Tlw6jBOYwhpJHEgTFImh9bfB7y3XWvfqyPyAnXyZd+WxsQJBAPNtmg2R1cnJOkxsU4SG+QvK+p4L8GLyirc9+UMOjp+ymnuwuTXImHSu3StLrxCg8sqVZRO2QGOxdVu4SAy/S70CQQDVqnF33bRq/HyANPmyZuvwM/Esz5mzFFEE1cUPqTwzV0lDhCWylXlOWRLMktqbo+wbmXneuSPQDyDBhqbXvGklAkBp6Fhq6PULiqn7j/GyKgr2b4Qj+OvIEN/7I1JsM0wn/MurXtLlrHVv5phA+veak3uuWdsU/Wj8NrvpgL6QFTY9AkB/uDXBiAZb2Xd2j7Qev0UTvYjR13qxwFg5wqrcFLaGnguOT0TVfmIXwkjpfnMsjA0L5m8iApt0uEZFSH8dAGP9AkA62O3u9ssQX27MGovP6/Ld5G5FJydjLmJoQ4g26QYFrwRxzE46DenUmULn7RcIcvV6faaUKyK4GBKTW4p7usu0"; 
+    //public static final String PRIVATE_KEY = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAJ4UueZIuSlq5HiGbFqQirMRBpSasAFZh8vHOUGt15+dVrQlkzmYXOdYOZjZIHBhvbU35hD5jgu1PXOHNYdpQIyp6sNxZYJMst7NhHx5SertQg3+91BVOG6siipHm9O43aXqzKZtDsfCpOWyKQnxkYmOPExVIX5wF76CFgiZ+6b9AgMBAAECgYBb2s0+e2lkIKGLSwixAyYk8LKzLMMytZRLm4KwoFQXgjQ8T00h/V+WadRl9Vx9EL5MC6Qanvej4/dGJv26pjUD3IPVz1CJKe7TjPxLCzs7eLwPmW2kOQAB2SNRSHQB3L+gl0b/JnzxfcRVNmdKKqw67FpZUnwGLS6IGb0aAWoGXQJBANxK0TNCtodVp9Ucb8fplD2ZPNCZgHxpKrekavnK+z+Sb1ZnBPj/3bRW5KeJrK+INzCdH828pbQWBT7aGLjlISsCQQC3tGhLtov/gB8Zlv4g3gnEdI+PM99bsE12Fu7eBnLkPSyf0Ikx/SBsO5rM8mIsIAUIYORdI/8vj9zSqg9q9bR3AkEAuzvD70OmjARbb6CJyWpYGrrhm5K8SAHC0u8mFUVWosO9abyJ13DxaNPp6BP1+ANYlTMW0vCiDhwhPTh1hsEInQJBAKA3wfa2wScXUQh6fi2gOZiTqFlW/mjzPLvPiIkvyqhxCihgMifdApgi7AHvK9wcGQeTqdfp+zg6GnfJRiUdIkUCQHg/Jq24c/c16J0B2mI/Qnfnt8spexYdLY50BRePyCrQDuag6pYKvyKaUItNWoMKoPUCL4KzrwFNmmGQUzuxB4Y=";
+    
+    
+    //public static String PRIVATE_KEY ="";
+    /**
+     * RSA最大加密明文大小
+     */
+    private static final int MAX_ENCRYPT_BLOCK = 117;
+    
+    /**
+     * RSA最大解密密文大小
+     */
+    private static final int MAX_DECRYPT_BLOCK = 128;
+    
+    
+    /**
+     * 生成密钥对(公钥和私钥)
+     * @return
+     * @throws Exception
+     */
+    public static Map<String, Object> genKeyPair() throws Exception {
+        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(KEY_ALGORITHM);
+        keyPairGen.initialize(1024);//初始大小
+        KeyPair keyPair = keyPairGen.generateKeyPair();
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+        Map<String, Object> keyMap = new HashMap<String, Object>(2);
+        keyMap.put(PUBLIC_KEY, publicKey);
+        keyMap.put(PRIVATE_KEY, privateKey);
+        return keyMap;
+    }
+    
+    public static void main(String[] args) {
+	}
+    
+    /**
+     * 
+     * 用私钥对信息生成数字签名
+     * @param data 已加密数据
+     * @param privateKey 私钥(BASE64编码)
+     * @return
+     * @throws Exception
+     */
+    public static String sign(byte[] data, String privateKey) throws Exception {
+        byte[] keyBytes = Base64.decodeBase64(privateKey);
+        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+        PrivateKey privateK = keyFactory.generatePrivate(pkcs8KeySpec);
+        Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
+        signature.initSign(privateK);
+        signature.update(data);
+        return Base64.encodeBase64String(signature.sign());
+    }
+
+    /**
+     * 
+     * 校验数字签名
+     * 
+     * 
+     * @param data 已加密数据
+     * @param publicKey 公钥(BASE64编码)
+     * @param sign 数字签名
+     * 
+     * @return
+     * @throws Exception
+     * 
+     */
+    public static boolean verify(byte[] data, String publicKey, String sign)
+            throws Exception {
+    	 byte[] keyBytes = Base64.decodeBase64(publicKey);
+         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+         PublicKey publicK = keyFactory.generatePublic(keySpec);
+         Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
+         signature.initVerify(publicK);
+         signature.update(data);
+         return signature.verify(Base64.decodeBase64(sign));
+    }
+
+    /**
+     * 
+     * 私钥解密
+     * 
+     * 
+     * @param encryptedData 已加密数据
+     * @param privateKey 私钥(BASE64编码)
+     * @return
+     * @throws Exception
+     */
+    public static byte[] decryptByPrivateKey(byte[] encryptedData, String privateKey)
+            throws Exception {
+        byte[] keyBytes = Base64.decodeBase64(privateKey);
+        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+        Key privateK = keyFactory.generatePrivate(pkcs8KeySpec);
+        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+        cipher.init(Cipher.DECRYPT_MODE, privateK);
+        int inputLen = encryptedData.length;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int offSet = 0;
+        byte[] cache;
+        int i = 0;
+        // 对数据分段解密
+        while (inputLen - offSet > 0) {
+            if (inputLen - offSet > MAX_DECRYPT_BLOCK) {
+                cache = cipher.doFinal(encryptedData, offSet, MAX_DECRYPT_BLOCK);
+            } else {
+                cache = cipher.doFinal(encryptedData, offSet, inputLen - offSet);
+            }
+            out.write(cache, 0, cache.length);
+            i++;
+            offSet = i * MAX_DECRYPT_BLOCK;
+        }
+        byte[] decryptedData = out.toByteArray();
+        out.close();
+        return decryptedData;
+    }
+
+    /**
+     * 
+     * 公钥解密
+     * 
+     * 
+     * @param encryptedData 已加密数据
+     * @param publicKey 公钥(BASE64编码)
+     * @return
+     * @throws Exception
+     */
+    public static byte[] decryptByPublicKey(byte[] encryptedData, String publicKey)
+            throws Exception {
+        byte[] keyBytes = Base64.decodeBase64(publicKey);
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+        Key publicK = keyFactory.generatePublic(x509KeySpec);
+        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+        cipher.init(Cipher.DECRYPT_MODE, publicK);
+        int inputLen = encryptedData.length;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int offSet = 0;
+        byte[] cache;
+        int i = 0;
+        // 对数据分段解密
+        while (inputLen - offSet > 0) {
+            if (inputLen - offSet > MAX_DECRYPT_BLOCK) {
+                cache = cipher.doFinal(encryptedData, offSet, MAX_DECRYPT_BLOCK);
+            } else {
+                cache = cipher.doFinal(encryptedData, offSet, inputLen - offSet);
+            }
+            out.write(cache, 0, cache.length);
+            i++;
+            offSet = i * MAX_DECRYPT_BLOCK;
+        }
+        byte[] decryptedData = out.toByteArray();
+        out.close();
+        return decryptedData;
+    }
+
+    /**
+     * 
+     * 公钥加密
+     * 
+     * 
+     * @param data 源数据
+     * @param publicKey 公钥(BASE64编码)
+     * @return
+     * @throws Exception
+     */
+    public static byte[] encryptByPublicKey(byte[] data, String publicKey)
+            throws Exception {
+        byte[] keyBytes = Base64.decodeBase64(publicKey);
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+        Key publicK = keyFactory.generatePublic(x509KeySpec);
+        // 对数据加密
+        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+        cipher.init(Cipher.ENCRYPT_MODE, publicK);
+        int inputLen = data.length;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int offSet = 0;
+        byte[] cache;
+        int i = 0;
+        // 对数据分段加密
+        while (inputLen - offSet > 0) {
+            if (inputLen - offSet > MAX_ENCRYPT_BLOCK) {
+                cache = cipher.doFinal(data, offSet, MAX_ENCRYPT_BLOCK);
+            } else {
+                cache = cipher.doFinal(data, offSet, inputLen - offSet);
+            }
+            out.write(cache, 0, cache.length);
+            i++;
+            offSet = i * MAX_ENCRYPT_BLOCK;
+        }
+        byte[] encryptedData = out.toByteArray();
+        out.close();
+        return encryptedData;
+    }
+
+    /**
+     * 
+     * 私钥加密
+     * 
+     * 
+     * @param data 源数据
+     * @param privateKey 私钥(BASE64编码)
+     * @return
+     * @throws Exception
+     */
+    public static byte[] encryptByPrivateKey(byte[] data, String privateKey)
+            throws Exception {
+        byte[] keyBytes = Base64.decodeBase64(privateKey);
+        PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+        Key privateK = keyFactory.generatePrivate(pkcs8KeySpec);
+        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+        cipher.init(Cipher.ENCRYPT_MODE, privateK);
+        int inputLen = data.length;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int offSet = 0;
+        byte[] cache;
+        int i = 0;
+        // 对数据分段加密
+        while (inputLen - offSet > 0) {
+            if (inputLen - offSet > MAX_ENCRYPT_BLOCK) {
+                cache = cipher.doFinal(data, offSet, MAX_ENCRYPT_BLOCK);
+            } else {
+                cache = cipher.doFinal(data, offSet, inputLen - offSet);
+            }
+            out.write(cache, 0, cache.length);
+            i++;
+            offSet = i * MAX_ENCRYPT_BLOCK;
+        }
+        byte[] encryptedData = out.toByteArray();
+        out.close();
+        return encryptedData;
+    }
+
+//    /**
+//     * 
+//     * 获取私钥
+//     * 
+//     * 
+//     * @param keyMap 密钥对
+//     * @return
+//     * @throws Exception
+//     */
+    public static String getPrivateKey(Map<String, Object> keyMap)
+            throws Exception {
+        Key key = (Key) keyMap.get(PRIVATE_KEY);
+        return Base64.encodeBase64String(key.getEncoded());
+    }
+//
+//    /**
+//     * 
+//     * 获取公钥
+//     * 
+//     * 
+//     * @param keyMap 密钥对
+//     * @return
+//     * @throws Exception
+//     */
+    public static String getPublicKey(Map<String, Object> keyMap)
+            throws Exception {
+        Key key = (Key) keyMap.get(PUBLIC_KEY);
+        return Base64.encodeBase64String(key.getEncoded());
+    }
+    
+    
+    /**
+     * 对数据加密 
+     * 返回经过Base64编码的加密字符串
+     * @param data 需要加密的数据 
+     * @param publicKey 公钥
+     * @return
+     */
+    public synchronized static String RSAEncode(String data,String publicKey) throws Exception{
+		//加密后的byte数组
+		byte[] encryptDataBytes = encryptByPublicKey(data.getBytes("UTF-8"), publicKey);
+		//经过base64编码
+		return Base64.encodeBase64String(encryptDataBytes);
+
+    }
+    
+    /**
+     * 数据解密
+     * 数据是经过Base64编码的加密字符串
+     * 返回解密后的字符串
+     * @param version
+     * @param data
+     * @return
+     */
+    public synchronized static String RSADecode(String privateKey,String data) throws Exception{
+		//加密数据进过Base64解码
+		byte[] decodeBytes = Base64.decodeBase64(data);
+		//通过私钥对数据解密
+		byte[]  decryptData = decryptByPrivateKey(decodeBytes, privateKey);
+		return new String(decryptData, "utf-8");
+    }
+
+}

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.FlowDataMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.FlowData" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="TEACHER_WIRELESS_FLOW" property="teacherWirelessFlow" jdbcType="DOUBLE" />
+    <result column="TEACHER_PC_FLOW" property="teacherPcFlow" jdbcType="DOUBLE" />
+    <result column="STUDENT_WIRELESS_FLOW" property="studentWirelessFlow" jdbcType="DOUBLE" />
+    <result column="STUDENT_PC_FLOW" property="studentPcFlow" jdbcType="DOUBLE" />
+    <result column="RECORD_DATE" property="recordDate" jdbcType="DATE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, TEACHER_WIRELESS_FLOW, TEACHER_PC_FLOW, STUDENT_WIRELESS_FLOW, STUDENT_PC_FLOW, 
+    RECORD_DATE
+  </sql>
+ 
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from FLOW_DATA
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  
+   <select id="findAll" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from FLOW_DATA ORDER BY RECORD_DATE DESC LIMIT 10
+   
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from FLOW_DATA
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.FlowData" >
+    insert into FLOW_DATA (ID, TEACHER_WIRELESS_FLOW, TEACHER_PC_FLOW, 
+      STUDENT_WIRELESS_FLOW, STUDENT_PC_FLOW, RECORD_DATE
+      )
+    values (#{id,jdbcType=VARCHAR}, #{teacherWirelessFlow,jdbcType=DOUBLE}, #{teacherPcFlow,jdbcType=DOUBLE}, 
+      #{studentWirelessFlow,jdbcType=DOUBLE}, #{studentPcFlow,jdbcType=DOUBLE}, #{recordDate,jdbcType=DATE}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.FlowData" >
+    insert into FLOW_DATA
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="teacherWirelessFlow != null" >
+        TEACHER_WIRELESS_FLOW,
+      </if>
+      <if test="teacherPcFlow != null" >
+        TEACHER_PC_FLOW,
+      </if>
+      <if test="studentWirelessFlow != null" >
+        STUDENT_WIRELESS_FLOW,
+      </if>
+      <if test="studentPcFlow != null" >
+        STUDENT_PC_FLOW,
+      </if>
+      <if test="recordDate != null" >
+        RECORD_DATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherWirelessFlow != null" >
+        #{teacherWirelessFlow,jdbcType=DOUBLE},
+      </if>
+      <if test="teacherPcFlow != null" >
+        #{teacherPcFlow,jdbcType=DOUBLE},
+      </if>
+      <if test="studentWirelessFlow != null" >
+        #{studentWirelessFlow,jdbcType=DOUBLE},
+      </if>
+      <if test="studentPcFlow != null" >
+        #{studentPcFlow,jdbcType=DOUBLE},
+      </if>
+      <if test="recordDate != null" >
+        #{recordDate,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.FlowData" >
+    update FLOW_DATA
+    <set >
+      <if test="teacherWirelessFlow != null" >
+        TEACHER_WIRELESS_FLOW = #{teacherWirelessFlow,jdbcType=DOUBLE},
+      </if>
+      <if test="teacherPcFlow != null" >
+        TEACHER_PC_FLOW = #{teacherPcFlow,jdbcType=DOUBLE},
+      </if>
+      <if test="studentWirelessFlow != null" >
+        STUDENT_WIRELESS_FLOW = #{studentWirelessFlow,jdbcType=DOUBLE},
+      </if>
+      <if test="studentPcFlow != null" >
+        STUDENT_PC_FLOW = #{studentPcFlow,jdbcType=DOUBLE},
+      </if>
+      <if test="recordDate != null" >
+        RECORD_DATE = #{recordDate,jdbcType=DATE},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.FlowData" >
+    update FLOW_DATA
+    set TEACHER_WIRELESS_FLOW = #{teacherWirelessFlow,jdbcType=DOUBLE},
+      TEACHER_PC_FLOW = #{teacherPcFlow,jdbcType=DOUBLE},
+      STUDENT_WIRELESS_FLOW = #{studentWirelessFlow,jdbcType=DOUBLE},
+      STUDENT_PC_FLOW = #{studentPcFlow,jdbcType=DOUBLE},
+      RECORD_DATE = #{recordDate,jdbcType=DATE}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

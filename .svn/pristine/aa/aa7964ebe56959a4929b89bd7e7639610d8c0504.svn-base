@@ -1,0 +1,52 @@
+@charset "utf-8";
+/* CSS Document */
+.s_student_accessbox{ width:100%; display:inline-block; text-align:center;vertical-align: top;height:450px;}
+.s_student_accessbox h1{ color:#0ce;font-size: 18px;font-weight: normal;text-align: center; padding: 20px 0 10px 0; clear:both; }
+.s_student_access_ulicon{ text-align:center;}
+.s_student_data{display:inline-table;}
+.s_student_a{color:#c3c;}
+.s_student_b{color:#f36;}
+.s_student_c{color:#09f;}
+.s_student_d{ color:#96f;}
+.s_student_ulicon{ display:inline-table; width:50%; float:right; }
+.s_student_ulicon li{ display:inline-table;width:50%; margin:5% 0; text-align:center;}
+.s_student_databg{ margin:1% 0 0 0;margin-left: 50px;width:517px;height: 210px}
+.s_student_data{ background: url(../../../../images/screen/module/studentAccessType/8.png) no-repeat top	; width:270px; height:180px; position:relative;}
+.s_student_no_a,.s_student_no_b,.s_student_no_c,.s_student_no_d{ position:absolute; font-size:14px; font-weight:bold;}
+.s_student_no_a{ left:100px;color:#f36;margin-left:-10px}
+.s_student_no_b{ left:195px;top:30px;color:#c3c;}
+.s_student_no_c{left:30px;top:70px;color:#96f;}
+.s_student_no_d{ left:254px;top:100px;color:#09f;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

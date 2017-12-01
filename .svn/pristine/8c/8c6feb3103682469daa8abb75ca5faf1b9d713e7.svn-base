@@ -1,0 +1,23 @@
+@charset "utf-8";
+/* CSS Document */
+.a_access_timebox{ width:100%; display:inline-block; text-align:center;vertical-align: top;    height: 428px;}
+.a_access_timebox h1{ color:#0ce;font-size: 18px;font-weight: normal;text-align: center; padding: 20px 0 10px 0; clear:both; }
+.a_everyday_data{ display: inline-block;}
+.a_access_ulicon{ float:right; text-align:center; width:50%;}
+.a_access_ulicon  li i{ width:35px; height:35px;}
+.a_access_ulicon li{ float:left; width:50%; margin:3% 0;}
+.a_access_a i,.a_access_b i,.a_access_c i,.a_access_d i{ background:url(../images/a_everydayicon.png) no-repeat;}
+.a_access_a i{ background-position:0 0;}
+.a_access_b i{ background-position:-90px 0;}
+.a_access_c i{ background-position:-179px 0;}
+.a_access_d i{ background-position:-269px 0;}
+.a_access_a{color:#0c9;  }
+.a_access_b{color:#0cc; }
+.a_access_c{color:#6c3; }
+.a_access_d{ color:#09c;}
+.a_each_data{ text-align:center;}
+.a_each_ulicon{ width:90%;     margin: 0px 32px 0 0px;}
+.a_each_ulicon li{ width:25%; display:inline-table;}
+
+
+.a_zlog_data_a svg {margin-left: -3px;margin-top: 5px;}

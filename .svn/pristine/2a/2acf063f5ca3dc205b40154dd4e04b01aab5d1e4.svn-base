@@ -1,0 +1,37 @@
+package info.zznet.znms.base.dao;
+
+import java.util.List;
+
+import info.zznet.znms.base.entity.ApInformation;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+@Repository("apInformationMapper")
+public interface ApInformationMapper extends BaseMapper{
+    int deleteByPrimaryKey(String apInformationUuid);
+
+    int insert(ApInformation record);
+
+    int insertSelective(ApInformation record);
+
+    ApInformation selectByPrimaryKey(String apInformationUuid);
+
+    int updateByPrimaryKeySelective(ApInformation record);
+
+    int updateByPrimaryKey(ApInformation record);
+
+	/**
+	 * @param acIp
+	 * @param apName
+	 * @return
+	 */
+	List<ApInformation> findApByCondition(@Param("acIp")String acIp, @Param("apName")String apName);
+
+	/**
+	 * @param apInformationUuid
+	 * @param apAxis
+	 */
+	void updateApAxis(@Param("apInformationUuid")String apInformationUuid, @Param("apAxis")String apAxis);
+
+}

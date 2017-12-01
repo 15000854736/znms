@@ -1,0 +1,35 @@
+.screen_grid{
+    display:table;
+    width:100%;
+}
+.screen_grid > div >div{
+    width:32%;
+    height: auto;
+    margin:10px;
+    padding: 15px;
+    border-radius: 5px;
+    position: relative;
+    box-shadow: 1px 1px 1px 1px #b4cadf;
+    float:left;
+}
+.R{
+    background: url(../../images/bg_img.png) repeat;
+    cursor:pointer;
+    position:absolute;
+    right:0px;
+    top:0px;
+}
+
+.grid-stack {
+    /*background: lightgoldenrodyellow;*/
+}
+
+.grid-stack-item-content {
+    /*color: #2c3e50;
+    text-align: center;
+    background-color: #18bc9c;*/
+}
+.screen_logo{
+    text-align: center;
+    max-height: 50px;
+}

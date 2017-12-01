@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.SystemLogMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.SystemLog" >
+    <id column="SEQ" property="seq" jdbcType="BIGINT" />
+    <result column="FACILITY_ID" property="facilityId" jdbcType="INTEGER" />
+    <result column="PRIORITY_ID" property="priorityId" jdbcType="INTEGER" />
+    <result column="HOST_ID" property="hostId" jdbcType="VARCHAR" />
+    <result column="LOG_TIME" property="logTime" jdbcType="TIMESTAMP" />
+    <result column="MESSAGE" property="message" jdbcType="VARCHAR" />
+    <collection property="host" column="HOST_ID" select="info.zznet.znms.base.dao.HostMapper.selectByPrimaryKey"></collection>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    SEQ, FACILITY_ID, PRIORITY_ID, HOST_ID, LOG_TIME, MESSAGE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYSTEM_LOG
+    where SEQ = #{seq,jdbcType=BIGINT}
+  </select>
+  
+	<select id="findPageList" resultMap="BaseResultMap"  parameterType="info.zznet.znms.web.module.common.page.Pager">
+	SELECT 
+	<include refid="Base_Column_List" />
+    FROM SYSTEM_LOG 
+    <where> 
+    	1=1
+   	 <if test="condition != null">
+		<foreach collection="condition" item="item">
+	  		<if test="item.value != null and item.value !=''">
+	  			<if test="item.key == 'message'">
+	  				<![CDATA[AND MESSAGE like CONCAT('%',#{item.value},'%') ]]>  
+	  			</if>
+	  			<if test="item.key == 'priorityId' and item.value != -1">
+	  				<![CDATA[AND PRIORITY_ID = #{item.value}]]>  
+	  			</if>
+		  		<if test="item.key == 'facilityId' and item.value != -1">
+		  		   <![CDATA[and FACILITY_ID = #{item.value}]]>
+		  		</if>
+		  		<if test="item.key == 'logTimeFrom'">
+		  			 	AND LOG_TIME  <![CDATA[ >= ]]> #{item.value}
+		  		</if>
+		  		<if test="item.key == 'logTimeTo'">
+		  				AND LOG_TIME  <![CDATA[ <= ]]> #{item.value}
+		  		</if>
+	  		</if>
+  		</foreach>
+	</if>
+  	</where> 
+  		ORDER BY LOG_TIME DESC	
+  		limit #{pager.limit} offset #{pager.offset}
+	</select>
+	
+	<select id="getCount" resultType="java.lang.Long">
+		SELECT count(SEQ) FROM SYSTEM_LOG
+    <where> 
+    	1=1
+   	 <if test="condition != null">
+		<foreach collection="condition" item="item">
+	  		<if test="item.value != null and item.value !=''">
+	  			<if test="item.key == 'message'">
+	  				<![CDATA[AND MESSAGE like CONCAT('%',#{item.value},'%') ]]>  
+	  			</if>
+	  			<if test="item.key == 'priorityId' and item.value != -1">
+	  				<![CDATA[AND PRIORITY_ID = #{item.value}]]>  
+	  			</if>
+		  		<if test="item.key == 'facilityId' and item.value != -1">
+		  		   <![CDATA[and FACILITY_ID = #{item.value}]]>
+		  		</if>
+		  		<if test="item.key == 'logTimeFrom'">
+		  			 	AND LOG_TIME  <![CDATA[ >= ]]> #{item.value}
+		  		</if>
+		  		<if test="item.key == 'logTimeTo'">
+		  				AND LOG_TIME  <![CDATA[ <= ]]> #{item.value}
+		  		</if>
+	  		</if>
+  		</foreach>
+	</if>
+  	</where> 
+	</select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SYSTEM_LOG
+    where SEQ = #{seq,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.SystemLog" >
+    insert into SYSTEM_LOG (SEQ, FACILITY_ID, PRIORITY_ID, 
+      HOST_ID, LOG_TIME, MESSAGE
+      )
+    values (#{seq,jdbcType=BIGINT}, #{facilityId,jdbcType=INTEGER}, #{priorityId,jdbcType=INTEGER}, 
+      #{hostId,jdbcType=VARCHAR}, #{logTime,jdbcType=TIMESTAMP}, #{message,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.SystemLog" >
+    insert into SYSTEM_LOG
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="seq != null" >
+        SEQ,
+      </if>
+      <if test="facilityId != null" >
+        FACILITY_ID,
+      </if>
+      <if test="priorityId != null" >
+        PRIORITY_ID,
+      </if>
+      <if test="hostId != null" >
+        HOST_ID,
+      </if>
+      <if test="logTime != null" >
+        LOG_TIME,
+      </if>
+      <if test="message != null" >
+        MESSAGE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="seq != null" >
+        #{seq,jdbcType=BIGINT},
+      </if>
+      <if test="facilityId != null" >
+        #{facilityId,jdbcType=INTEGER},
+      </if>
+      <if test="priorityId != null" >
+        #{priorityId,jdbcType=INTEGER},
+      </if>
+      <if test="hostId != null" >
+        #{hostId,jdbcType=VARCHAR},
+      </if>
+      <if test="logTime != null" >
+        #{logTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="message != null" >
+        #{message,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.SystemLog" >
+    update SYSTEM_LOG
+    <set >
+      <if test="facilityId != null" >
+        FACILITY_ID = #{facilityId,jdbcType=INTEGER},
+      </if>
+      <if test="priorityId != null" >
+        PRIORITY_ID = #{priorityId,jdbcType=INTEGER},
+      </if>
+      <if test="hostId != null" >
+        HOST_ID = #{hostId,jdbcType=VARCHAR},
+      </if>
+      <if test="logTime != null" >
+        LOG_TIME = #{logTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="message != null" >
+        MESSAGE = #{message,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where SEQ = #{seq,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.SystemLog" >
+    update SYSTEM_LOG
+    set FACILITY_ID = #{facilityId,jdbcType=INTEGER},
+      PRIORITY_ID = #{priorityId,jdbcType=INTEGER},
+      HOST_ID = #{hostId,jdbcType=VARCHAR},
+      LOG_TIME = #{logTime,jdbcType=TIMESTAMP},
+      MESSAGE = #{message,jdbcType=VARCHAR}
+    where SEQ = #{seq,jdbcType=BIGINT}
+  </update>
+  
+  <delete id="deleteOldLog">
+  	delete from SYSTEM_LOG
+  	order by LOG_TIME asc limit #{num}
+  </delete>
+  <delete id="deleteExpiredLog">
+  	delete from SYSTEM_LOG
+  	where LOG_TIME <![CDATA[<]]> #{expireDate,jdbcType=TIMESTAMP}
+  </delete>
+  
+  <update id="doPartitionByMonth" statementType="CALLABLE">
+		CALL Table_Partition_By_Month('${tableName}')
+	</update>
+</mapper>

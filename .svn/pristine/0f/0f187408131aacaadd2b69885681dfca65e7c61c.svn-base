@@ -1,0 +1,46 @@
+/**
+ * 
+ */
+package info.zznet.znms.web.module.apInformation.service;
+
+import java.util.List;
+
+
+
+import info.zznet.znms.base.entity.ApInformation;
+import info.zznet.znms.web.module.common.service.BaseService;
+
+/**
+ * @author dell001
+ *
+ */
+public interface ApInformationService extends BaseService{
+
+	/**
+	 * @param acIp
+	 * @param apName
+	 * @param apPositionStatus
+	 * @return
+	 */
+	List<ApInformation> findApByCondition(String acIp, String apName, int apPositionStatus);
+
+	/**
+	 * @param apInformationUuid
+	 * @param apAxis
+	 */
+	void update(String[] apInformationUuids, String apAxis);
+
+	/**
+	 * @param apInformationUuid
+	 * @return
+	 */
+	ApInformation selectByPrimaryKey(String apInformationUuid);
+
+	ApInformation findApByApMac(String apMac);
+	
+	void updateByPrimaryKeySelective(ApInformation record);
+	int addApInformation(ApInformation record);
+	List<ApInformation> findAll();
+	
+	 int deleteByPrimaryKey(String apInformationUuid);
+}

@@ -1,0 +1,220 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="description" content="">
+<meta name="author" content="">
+<%@ include file="./common/include.jsp"%>
+<script src="<%=path %>/js/jquery.kxbdMarquee.js"></script>
+<script src="<%=path %>/js/homePage/homePage.js"></script>
+<style>
+.traffic_data li{
+	margin:0 10px !important;
+}
+.network_health{height:420px !important;}
+.export_utilization{height:500px;float:left;}
+#marquee2{height:500px;}
+</style>
+<script>
+var path = "<%=path %>";
+var height = "";
+var width = "";
+	$(document).ready(function(){
+		$("#marquee2").kxbdMarquee({direction:"left"});
+		//获取出口流量数据
+		height = ($("#exportTd").height()-150-20)/2;
+		width = ($("#exportTd").width()-180-60)/3;
+		getExportFlowData();
+		//设置在线用户统计分析数据
+		getOnlineUserData();
+		getOnlineUserDataByCategory();
+		
+		//设置设备统计数据
+		getDeviceData();
+		
+		//查找网络主要设备监控数据
+		getMainDeviceMonitorData();
+		
+		//查询网络健康数据
+		getNetHeathData();
+		
+	});
+
+</script>
+
+
+</head>
+
+<body>
+
+	<%@ include file="common/header.jsp"%>
+	<%@ include file="common/leftMenu.jsp"%>
+	
+<div class="nms_box_center">
+
+<table class="nms_mod_table">
+
+  <tr>
+    <td align="center" valign="top" id="exportTd">
+      	<div class="indexwrong_box">
+        <h1>出口流量</h1>
+        </div>
+        <div class="height_500">
+	        <div id="marquee2" class="box4">
+	        	<div class=" index_monitor_box_b" id="exportDiv"></div>
+	      	</div>
+      </div>	
+     </td>	
+    
+    
+    <td align="center" valign="top" class="wh_30b">
+      <div class="indexwrong_box">
+      	<h1>在线用户统计分析</h1>
+      </div>
+      <div class="online_user_boxb">
+        <div class="online_user_p ">注册总人数：<span class="bold" id="totalRegistUser"></span></div>
+        <ul class="online_user_ul">
+          <li id="totalUserLi4"></li><li id="totalUserLi3"></li><li id="totalUserLi2"></li><li id="totalUserLi1"></li><li id="totalUserLi0"></li>
+        </ul>
+        <ul class="online_user_sort">
+        	<li title="电脑" class="online_user_pc"><div class="L">电脑</div><span id="pcUser" class="bold"></span></li>
+        	<li title="移动设备" class="online_user_m"><div class="L">移动</div><span class="bold" id="wirelessUser"></span></li>
+        	<li title="其他" class="online_user_other"><div class="L">其他</div><span class="bold" id="otherUser"></span></li>
+        </ul>
+      </div>   
+      <div class="nms_data_statistics" style="width:480;height:250" id="onlineUserPic">
+      	
+      </div>
+      
+      <script type="text/javascript">
+	        // 基于准备好的dom，初始化echarts实例
+	        var onlineUserChart = echarts.init(document.getElementById('onlineUserPic'));
+	  </script>
+     </td>
+    
+    
+  </tr>
+    <tr>
+      <td align="center" valign="top" class="">
+        
+  <div class="indexwrong_box ">
+    <h1>设备统计</h1></div>
+        <div class="sta_top indexwrong_device">
+          <ul>
+            <li>
+            	<div class="znms_sbimg_icon L">
+            		<img src="images/z-switch.png" width="60" >
+            	</div>
+            	<div class="impact R" id="exchangeDeviceTotal"></div>
+	            <div class="list_cpudataram">
+			        <div class="list_modbox">
+			          <div class="list_fontbox">
+			            <div class="L">在线</div><div class="R" id="exchangeDeviceOnline"></div></div>
+			          <div class="list_modcolor"><div class="ram_per" id="exchangeOnlinePercent"></div></div>
+			        </div>
+		        
+		        	<div class="list_modbox">
+			          <div class="list_fontbox">
+			            <div class="L">宕机</div><div class="R"  id="exchangeDeviceDown"></div></div>
+			          <div class="list_modcolor"><div class="data_per" id="exchangeDownPercent"></div></div>
+			        </div>
+	        	</div>
+        	</li>
+        	
+            <li>
+	            <div class="znms_sbimg_icon L"><img src="images/z-gateway.png" width="60"></div>
+	            <div class="impact R" id="gatewayDeviceTotalCount"></div>
+            
+            	<div class="list_cpudataram">
+		        <div class="list_modbox">
+		          <div class="list_fontbox">
+		            <div class="L">在线</div><div class="R" id="gatewayDeviceOnlineCount"></div></div>
+		          <div class="list_modcolor"><div class="ram_per" id="gatewayOnlinePercent"></div></div>
+		          </div>
+		        <div class="list_modbox">
+		          <div class="list_fontbox">
+		            <div class="L">宕机</div><div class="R" id="gatewayDeviceDownCount"></div></div>
+		          <div class="list_modcolor"><div class="data_per" id="gatewayDownPercent"></div></div>
+		          </div>
+		        </div>
+		    </li>
+		    
+            <li>
+            	<div class="znms_sbimg_icon L"><img src="images/z-ap.png" width="60" ></div>
+            	<div class="impact R" id="wirelessDeviceTotalCount"></div>
+            	<div class="list_cpudataram">
+		        <div class="list_modbox">
+		          <div class="list_fontbox">
+		            <div class="L">在线</div><div class="R" id="wirelesDeviceOnlineCount"></div></div>
+		          <div class="list_modcolor"><div class="ram_per" id="wirelessOnlinePercent"></div></div>
+		          </div>
+		        <div class="list_modbox">
+		          <div class="list_fontbox">
+		            <div class="L">宕机</div><div class="R" id="wirelesDeviceDownCount"></div></div>
+		          <div class="list_modcolor"><div class="data_per" id="wirelessDownPercent"></div></div>
+		          </div>
+		        </div>
+		    </li>
+		    
+            <li>
+            	<div class="znms_sbimg_icon L"><img src="images/z-elog.png" width="60"></div>
+            	<div class=" impact R" id="otherDeviceTotalCount"></div>
+            	<div class="list_cpudataram">
+			        <div class="list_modbox">
+			          <div class="list_fontbox">
+			            <div class="L">在线</div><div class="R" id="otherDeviceOnlineCount"></div></div>
+			          <div class="list_modcolor"><div class="ram_per" id="otherOnlinePercent"></div></div>
+			          </div>
+			        <div class="list_modbox">
+			          <div class="list_fontbox">
+			            <div class="L">宕机</div><div class="R" id="otherDeviceDownCount"></div></div>
+			          <div class="list_modcolor"><div class="data_per" id="otherDownPercent"></div></div>
+			          </div>
+			     </div>
+        	</li>
+        	
+            </ul>
+          </div>
+        
+        </td>
+      <td rowspan="2" align="center" valign="top" class="wh_30b">
+        <div class="indexwrong_box "><h1>网络健康度</h1></div>
+        <div class="sta_top">
+          <ul>
+          	<li id="netHeathLi0">
+            </li>
+            <li id="netHeathLi1">
+            </li>
+            <li id="netHeathLi2">
+            </li>
+            <li id="netHeathLi3">
+            </li>
+          </ul>
+          <div class="network_health"><h1>网络健康良好</h1><span class="led_fonts" id="netHeath"></span><div class="network_health_imgbg"></div></div>
+          
+          </div>
+        
+        </td>
+    </tr>
+  <tr>
+    <td align="center" valign="top" class="">  
+    	<div class="indexwrong_box">
+        	<h1>网络主要设备监控</h1>
+        </div>
+        <div id="marquee1">
+              
+	    <div class="monitor_box index_monitor_box " id="mainDeviceMonitorDiv">
+	        
+	     </div>
+	     </div>
+    </td>
+  </tr>
+</table>
+</div>
+
+</body>
+
+
+</html>

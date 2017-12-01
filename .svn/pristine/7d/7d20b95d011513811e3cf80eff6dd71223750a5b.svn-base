@@ -1,0 +1,117 @@
+/* 菜单相关*/
+.nms_left{
+    width: 120px;
+}
+.nms_menu_box .nms_menu_a li{
+    padding:0 0 0 10px;
+}
+.nms_menu_b{
+    padding:0 0 10px 15px;
+}
+
+/*内容相关*/
+.nms_box{
+    margin: 0 0 0 120px;
+}
+
+.height_500{
+    height:380px;
+}
+
+/*标题*/
+.indexwrong_box{
+    margin:5px 5px 0px 5px;
+}
+
+/*出口链路*/
+#exportFlow{
+    width:770px;
+    height: 380px;
+}
+
+.exportPlate{
+    width:230px;
+    height:180px;
+}
+.exportLine{
+    width:230px;
+    height:100px;
+}
+
+
+.export_utilization{
+    height: 380px;
+    width:255px;
+    margin:0 0px;
+}
+.index_monitor_box_b{height:380px; }
+
+/*在线用户*/
+/*.online_user_p{
+    margin: 0px;
+    font-size: 12px;
+}*/
+/*.online_user_ul li{
+    height:50px;
+    font-size:25px;
+    line-height:50px;
+}*/
+/*.online_user_sort li{
+    margin: 5px 0px;
+}*/
+.nms_data_statistics{
+    height: 245px !important;
+    width: 400px !important;
+    margin-top: -50px;
+}
+.online_user_boxb{
+    margin: 15px 0 0 0;
+}
+
+
+/*上下行流量*/
+.traffic_data{
+    margin-top: -20px;
+}
+.traffic_data li{
+    margin: 0 0px !important;
+}
+.traffic_data ul li h2{
+    padding: 5px 0px;
+    font-size: 10px;
+}
+
+
+
+/*网络设备监控*/
+.index_monitor_box .net_monitor_mod{
+    width:180px;
+    height:180px;
+    margin: 0 2px;
+}
+#marquee1{
+    width:770px;
+    height: 200px;
+}
+
+/*设备统计*/
+.znms_sbimg_icon img{
+    margin: 0px;
+    visibility:hidden;
+}
+.znms_sbimg_icon p{
+    margin: -55px 0px 0px 0px;
+}
+.znms_sbimg_icon{
+    margin: 0px;
+}
+.sta_top ul li{
+    padding: 0px;
+}
+.list_cpudataram{
+    height: 90px;
+    margin-top: 10px;
+}
+.list_cpudataram .list_modbox{
+    margin-top: 30px;
+}

@@ -1,0 +1,86 @@
+package info.zznet.znms.web.module.apInformation.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import info.zznet.znms.base.dao.ApMapMapper;
+import info.zznet.znms.base.entity.ApMap;
+import info.zznet.znms.web.module.apInformation.service.ApMapService;
+import info.zznet.znms.web.module.common.page.Order;
+import info.zznet.znms.web.module.common.page.PageBounds;
+import info.zznet.znms.web.module.common.page.Pager;
+
+@Transactional(propagation = Propagation.REQUIRED,rollbackFor=Exception.class)
+@Service("apMapService")
+public class ApMapImpl implements ApMapService{
+	
+	@Autowired
+	private ApMapMapper apMapMapper;
+	
+	@Override
+	public PageBounds getPageBounds(Pager pager, List orders) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Pager findPagedObjects(Pager pager) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Pager findPagedObjects(Pager pager, Order order) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Pager findPagedObjects(Pager pager, List orders) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Class getQueryClass() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List findByPage(PageBounds bounds, Object t) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int count(Object t) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int findCountByPage(Pager pager) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public ApMap findNewestMap() {
+		return apMapMapper.findNewestMap();
+	}
+	
+	@Override
+	public String getLatestPicture(){
+		try{
+		  ApMap apMap=apMapMapper.findNewestMap();
+		  return "image/"+apMap.getApMapName();
+		} catch (Exception e) {
+			return "";
+		}
+	}
+}

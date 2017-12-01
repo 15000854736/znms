@@ -1,0 +1,47 @@
+package info.zznet.znms.web.module.systemLog.collector;
+
+import info.zznet.znms.base.common.ZNMSLogger;
+import info.zznet.znms.web.util.PathUtil;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
+import io.netty.channel.socket.nio.NioDatagramChannel;
+
+public class CollectorCore {
+	public void init() {
+		new Thread() {
+			public void run() {
+				EventLoopGroup group;
+				group = new NioEventLoopGroup();
+				try {
+					Bootstrap b = new Bootstrap();
+					b.group(group).channel(NioDatagramChannel.class)
+							.option(ChannelOption.SO_BROADCAST, true)
+							.handler(new ChannelInitializer<DatagramChannel>() {
+								@Override
+								protected void initChannel(DatagramChannel ch)
+										throws Exception {
+									ch.pipeline().addLast(
+											new NettyHandler());
+								}
+							});
+					try {
+						String HOST = PathUtil.getServerBindAddress();
+						int PORT = 514;
+						ZNMSLogger.info(" bind netty server---->IP:" + HOST
+								+ " PORT:" + PORT);
+						b.bind(HOST, PORT).sync().channel().closeFuture()
+								.sync();
+					} catch (InterruptedException e) {
+						ZNMSLogger.error(e);
+					}
+				} finally {
+					group.shutdownGracefully();
+				}
+			}
+		}.start();
+	}
+}

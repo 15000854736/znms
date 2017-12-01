@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.HostMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.Host" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="HOST_IP" property="hostIp" jdbcType="VARCHAR" />
+    <result column="HOST_NAME" property="hostName" jdbcType="VARCHAR" />
+    <result column="SNMP_COMMUNITY" property="snmpCommunity" jdbcType="VARCHAR" />
+    <result column="SNMP_VERSION" property="snmpVersion" jdbcType="SMALLINT" />
+    <result column="SNMP_USER_NAME" property="snmpUserName" jdbcType="VARCHAR" />
+    <result column="SNMP_PASSWORD" property="snmpPassword" jdbcType="VARCHAR" />
+    <result column="SNMP_AUTH_PROTOCOL" property="snmpAuthProtocol" jdbcType="VARCHAR" />
+    <result column="SNMP_PRIV_PASSPHRASE" property="snmpPrivPassphrase" jdbcType="VARCHAR" />
+    <result column="SNMP_PRIV_PROTOCOL" property="snmpPrivProtocol" jdbcType="VARCHAR" />
+    <result column="SNMP_CONTEXT" property="snmpContext" jdbcType="VARCHAR" />
+    <result column="SNMP_PORT" property="snmpPort" jdbcType="INTEGER" />
+    <result column="SNMP_TIMEOUT" property="snmpTimeout" jdbcType="INTEGER" />
+    <result column="AVAILABILITY_METHOD" property="availabilityMethod" jdbcType="SMALLINT" />
+    <result column="PING_METHOD" property="pingMethod" jdbcType="SMALLINT" />
+    <result column="PING_PORT" property="pingPort" jdbcType="INTEGER" />
+    <result column="PING_TIMEOUT" property="pingTimeout" jdbcType="INTEGER" />
+    <result column="PING_RETRIES" property="pingRetries" jdbcType="INTEGER" />
+    <result column="STATUS" property="status" jdbcType="TINYINT" />
+    <result column="STATUS_FAIL_DATE" property="statusFailDate" jdbcType="TIMESTAMP" />
+    <result column="STATUS_REC_DATE" property="statusRecDate" jdbcType="TIMESTAMP" />
+    <result column="STATUS_LAST_ERROR" property="statusLastError" jdbcType="VARCHAR" />
+    <result column="MIN_TIME" property="minTime" jdbcType="DECIMAL" />
+    <result column="MAX_TIME" property="maxTime" jdbcType="DECIMAL" />
+    <result column="CUR_TIME" property="curTime" jdbcType="DECIMAL" />
+    <result column="AVG_TIME" property="avgTime" jdbcType="DECIMAL" />
+    <result column="AVAILABILITY" property="availability" jdbcType="DECIMAL" />
+    <result column="HOST_WORK_STATUS" property="hostWorkStatus" jdbcType="INTEGER" />
+    <result column="LAST_SHUT_DOWN_TIME" property="lastShutDownTime" jdbcType="TIMESTAMP" />
+    <result column="NOTES" property="notes" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="DEFAULT_ACCESS" property="defaultAccess" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, HOST_IP, HOST_NAME, SNMP_COMMUNITY, SNMP_VERSION, SNMP_USER_NAME, SNMP_PASSWORD, 
+    SNMP_AUTH_PROTOCOL, SNMP_PRIV_PASSPHRASE, SNMP_PRIV_PROTOCOL, SNMP_CONTEXT, SNMP_PORT, 
+    SNMP_TIMEOUT, AVAILABILITY_METHOD, PING_METHOD, PING_PORT, PING_TIMEOUT, PING_RETRIES, 
+    STATUS, STATUS_FAIL_DATE, STATUS_REC_DATE, STATUS_LAST_ERROR, MIN_TIME, MAX_TIME, 
+    CUR_TIME, AVG_TIME, AVAILABILITY, HOST_WORK_STATUS, LAST_SHUT_DOWN_TIME,NOTES, CREATE_TIME, DEFAULT_ACCESS
+  </sql>
+  
+   <select id="selectByPrimaryKey" resultMap="BaseResultMap"  parameterType="java.lang.String">
+	   	SELECT 
+		<include refid="Base_Column_List" />
+		from HOST where ID = #{id,jdbcType=VARCHAR}
+   </select>
+  
+  <select id="findPageList" resultMap="BaseResultMap"  parameterType="info.zznet.znms.web.module.common.page.Pager">
+	SELECT 
+	<include refid="Base_Column_List" />
+    FROM HOST 
+    <where> 
+    	1=1
+   	 <if test="condition != null">
+		<foreach collection="condition" item="item">
+	  		<if test="item.value != null and item.value !=''">
+	  			<if test="item.key == 'hostName'">
+	  				<![CDATA[AND HOST_NAME like CONCAT('%',#{item.value},'%') ]]>  
+	  			</if>
+	  			<if test="item.key == 'hostIp'">
+	  				<![CDATA[AND HOST_IP like CONCAT('%',#{item.value},'%') ]]>  
+	  			</if>
+		  		<if test="item.key == 'status' and item.value != -1">
+		  		   <![CDATA[and STATUS = #{item.value}]]>
+		  		</if>
+		  		<if test="item.key == 'hostWorkStatus' and item.value != -1">
+		  		   <![CDATA[and HOST_WORK_STATUS = #{item.value}]]>
+		  		</if>
+	  		</if>
+  		</foreach>
+	</if>
+  	</where> 
+  		ORDER BY CREATE_TIME DESC	
+  		limit #{pager.limit} offset #{pager.offset}
+	</select>
+	
+	<select id="getCount" resultType="java.lang.Long">
+		SELECT count(ID) FROM HOST
+    <where> 
+    	1=1
+   	 <if test="condition != null">
+		<foreach collection="condition" item="item">
+	  		<if test="item.value != null and item.value !=''">
+	  			<if test="item.key == 'hostName'">
+	  				<![CDATA[AND HOST_NAME like CONCAT('%',#{item.value},'%') ]]>  
+	  			</if>
+	  			<if test="item.key == 'hostIp'">
+	  				<![CDATA[AND HOST_IP like CONCAT('%',#{item.value},'%') ]]>  
+	  			</if>
+		  		<if test="item.key == 'status' and item.value != -1">
+		  		   <![CDATA[and STATUS = #{item.value}]]>
+		  		</if>
+	  		</if>
+  		</foreach>
+	</if>
+  	</where> 
+	</select>
+	
+	<select id="findApplicableHost" resultMap="BaseResultMap"  parameterType="java.lang.String">
+	   	SELECT 
+		<include refid="Base_Column_List" />
+		from HOST
+		where ID not in (select HOST_ID from GRAPH_TREE_ITEM where PARENT_UUID = #{nodeUuid,jdbcType=VARCHAR})
+   </select>
+   
+   <select id="findDeviceHost" resultMap="BaseResultMap" parameterType="java.lang.String">
+	   	SELECT 
+		<include refid="Base_Column_List" />
+		from HOST
+		where ID not in (select HOST_UUID from BACKUP_CONFIGURATION_DEVICE where DEVICE_UUID != #{deviceUuid,jdbcType=VARCHAR})
+   </select>
+   
+   <select id="findAll" resultMap="BaseResultMap" parameterType="java.lang.String">
+	   	SELECT 
+		<include refid="Base_Column_List" />
+		from HOST
+   </select>
+   
+   <select id="checkHostIp" resultMap="BaseResultMap">
+	   	SELECT 
+		<include refid="Base_Column_List" />
+		from HOST
+		where HOST_IP = #{hostIp,jdbcType=VARCHAR}
+		and ID != #{id,jdbcType=VARCHAR}
+   </select>
+   
+   <select id="checkHostName" resultMap="BaseResultMap">
+	   	SELECT 
+		<include refid="Base_Column_List" />
+		from HOST
+		where HOST_NAME = #{hostName,jdbcType=VARCHAR}
+		and ID != #{id,jdbcType=VARCHAR}
+   </select>
+    
+   <select id="findAllAc" resultMap="BaseResultMap">
+	   	SELECT count(ID)
+		<include refid="Base_Column_List" />
+		from HOST
+		where DEFAULT_ACCESS = 3
+   </select>
+   
+   <select id="getDeviceCountByCondition" resultType="java.lang.Integer">
+	   	SELECT count(ID)
+		from HOST
+		<where>
+			<choose>
+				<when test="hostWorkStatus>=0">
+					HOST_WORK_STATUS = #{hostWorkStatus,jdbcType=INTEGER}
+				</when>
+			</choose>
+			and DEFAULT_ACCESS in
+			<foreach collection="deviceTypeArray" item="deviceType" index="index"
+	            open="(" close=")" separator=",">
+	            #{deviceType}
+	        </foreach>
+		</where>
+   </select>
+   
+   <select id="getMainDeviceMonitorData" resultMap="BaseResultMap">
+	   	SELECT
+		<include refid="Base_Column_List" />
+		from HOST
+		<where>
+			DEFAULT_ACCESS in
+			<foreach collection="deviceTypeArray" item="deviceType" index="index"
+	            open="(" close=")" separator=",">
+	            #{deviceType}
+	        </foreach>
+		</where>
+   </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from HOST
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteHostByUuidList" parameterType="java.util.List" >
+  	delete from HOST where ID in 
+  	<foreach item="item" index="index" collection="uuids" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+
+  </delete>
+  
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.Host" >
+    insert into HOST (ID, HOST_IP, HOST_NAME, 
+      SNMP_COMMUNITY, SNMP_VERSION, SNMP_USER_NAME, 
+      SNMP_PASSWORD, SNMP_AUTH_PROTOCOL, SNMP_PRIV_PASSPHRASE, 
+      SNMP_PRIV_PROTOCOL, SNMP_CONTEXT, SNMP_PORT, 
+      SNMP_TIMEOUT, AVAILABILITY_METHOD, PING_METHOD, 
+      PING_PORT, PING_TIMEOUT, PING_RETRIES, 
+      STATUS, STATUS_FAIL_DATE, STATUS_REC_DATE, 
+      STATUS_LAST_ERROR, MIN_TIME, MAX_TIME, 
+      CUR_TIME, AVG_TIME, AVAILABILITY, HOST_WORK_STATUS, LAST_SHUT_DOWN_TIME,
+      NOTES, CREATE_TIME, DEFAULT_ACCESS)
+    values (#{id,jdbcType=VARCHAR}, #{hostIp,jdbcType=VARCHAR}, #{hostName,jdbcType=VARCHAR}, 
+      #{snmpCommunity,jdbcType=VARCHAR}, #{snmpVersion,jdbcType=BIT}, #{snmpUserName,jdbcType=VARCHAR}, 
+      #{snmpPassword,jdbcType=VARCHAR}, #{snmpAuthProtocol,jdbcType=CHAR}, #{snmpPrivPassphrase,jdbcType=VARCHAR}, 
+      #{snmpPrivProtocol,jdbcType=CHAR}, #{snmpContext,jdbcType=VARCHAR}, #{snmpPort,jdbcType=INTEGER}, 
+      #{snmpTimeout,jdbcType=INTEGER}, #{availabilityMethod,jdbcType=SMALLINT}, #{pingMethod,jdbcType=SMALLINT}, 
+      #{pingPort,jdbcType=INTEGER}, #{pingTimeout,jdbcType=INTEGER}, #{pingRetries,jdbcType=INTEGER}, 
+      #{status,jdbcType=TINYINT}, #{statusFailDate,jdbcType=TIMESTAMP}, #{statusRecDate,jdbcType=TIMESTAMP}, 
+      #{statusLastError,jdbcType=VARCHAR}, #{minTime,jdbcType=DECIMAL}, #{maxTime,jdbcType=DECIMAL}, 
+      #{curTime,jdbcType=DECIMAL}, #{avgTime,jdbcType=DECIMAL}, #{availability,jdbcType=DECIMAL}, 
+      #{hostWorkStatus,jdbcType=INTEGER}, #{lastShutDownTime,jdbcType=TIMESTAMP}, #{notes,jdbcType=VARCHAR}, now(3),
+      #{defaultAccess,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.Host" >
+    insert into HOST
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="hostIp != null" >
+        HOST_IP,
+      </if>
+      <if test="hostName != null" >
+        HOST_NAME,
+      </if>
+      <if test="snmpCommunity != null" >
+        SNMP_COMMUNITY,
+      </if>
+      <if test="snmpVersion != null" >
+        SNMP_VERSION,
+      </if>
+      <if test="snmpUserName != null" >
+        SNMP_USER_NAME,
+      </if>
+      <if test="snmpPassword != null" >
+        SNMP_PASSWORD,
+      </if>
+      <if test="snmpAuthProtocol != null" >
+        SNMP_AUTH_PROTOCOL,
+      </if>
+      <if test="snmpPrivPassphrase != null" >
+        SNMP_PRIV_PASSPHRASE,
+      </if>
+      <if test="snmpPrivProtocol != null" >
+        SNMP_PRIV_PROTOCOL,
+      </if>
+      <if test="snmpContext != null" >
+        SNMP_CONTEXT,
+      </if>
+      <if test="snmpPort != null" >
+        SNMP_PORT,
+      </if>
+      <if test="snmpTimeout != null" >
+        SNMP_TIMEOUT,
+      </if>
+      <if test="availabilityMethod != null" >
+        AVAILABILITY_METHOD,
+      </if>
+      <if test="pingMethod != null" >
+        PING_METHOD,
+      </if>
+      <if test="pingPort != null" >
+        PING_PORT,
+      </if>
+      <if test="pingTimeout != null" >
+        PING_TIMEOUT,
+      </if>
+      <if test="pingRetries != null" >
+        PING_RETRIES,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="statusFailDate != null" >
+        STATUS_FAIL_DATE,
+      </if>
+      <if test="statusRecDate != null" >
+        STATUS_REC_DATE,
+      </if>
+      <if test="statusLastError != null" >
+        STATUS_LAST_ERROR,
+      </if>
+      <if test="minTime != null" >
+        MIN_TIME,
+      </if>
+      <if test="maxTime != null" >
+        MAX_TIME,
+      </if>
+      <if test="curTime != null" >
+        CUR_TIME,
+      </if>
+      <if test="avgTime != null" >
+        AVG_TIME,
+      </if>
+      <if test="availability != null" >
+        AVAILABILITY,
+      </if>
+      <if test="hostWorkStatus != null" >
+        HOST_WORK_STATUS,
+      </if>
+      <if test="lastShutDownTime != null" >
+        LAST_SHUT_DOWN_TIME,
+      </if>
+      <if test="notes != null" >
+        NOTES,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+      <if test="defaultAccess != null" >
+        DEFAULT_ACCESS,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="hostIp != null" >
+        #{hostIp,jdbcType=VARCHAR},
+      </if>
+      <if test="hostName != null" >
+        #{hostName,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpCommunity != null" >
+        #{snmpCommunity,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpVersion != null" >
+        #{snmpVersion,jdbcType=BIT},
+      </if>
+      <if test="snmpUserName != null" >
+        #{snmpUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpPassword != null" >
+        #{snmpPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpAuthProtocol != null" >
+        #{snmpAuthProtocol,jdbcType=CHAR},
+      </if>
+      <if test="snmpPrivPassphrase != null" >
+        #{snmpPrivPassphrase,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpPrivProtocol != null" >
+        #{snmpPrivProtocol,jdbcType=CHAR},
+      </if>
+      <if test="snmpContext != null" >
+        #{snmpContext,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpPort != null" >
+        #{snmpPort,jdbcType=INTEGER},
+      </if>
+      <if test="snmpTimeout != null" >
+        #{snmpTimeout,jdbcType=INTEGER},
+      </if>
+      <if test="availabilityMethod != null" >
+        #{availabilityMethod,jdbcType=SMALLINT},
+      </if>
+      <if test="pingMethod != null" >
+        #{pingMethod,jdbcType=SMALLINT},
+      </if>
+      <if test="pingPort != null" >
+        #{pingPort,jdbcType=INTEGER},
+      </if>
+      <if test="pingTimeout != null" >
+        #{pingTimeout,jdbcType=INTEGER},
+      </if>
+      <if test="pingRetries != null" >
+        #{pingRetries,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="statusFailDate != null" >
+        #{statusFailDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="statusRecDate != null" >
+        #{statusRecDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="statusLastError != null" >
+        #{statusLastError,jdbcType=VARCHAR},
+      </if>
+      <if test="minTime != null" >
+        #{minTime,jdbcType=DECIMAL},
+      </if>
+      <if test="maxTime != null" >
+        #{maxTime,jdbcType=DECIMAL},
+      </if>
+      <if test="curTime != null" >
+        #{curTime,jdbcType=DECIMAL},
+      </if>
+      <if test="avgTime != null" >
+        #{avgTime,jdbcType=DECIMAL},
+      </if>
+      <if test="availability != null" >
+        #{availability,jdbcType=DECIMAL},
+      </if>
+       <if test="hostWorkStatus != null" >
+        #{hostWorkStatus,jdbcType=INTEGER},
+      </if>
+       <if test="lastShutDownTime != null" >
+        #{lastShutDownTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="notes != null" >
+        #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="defaultAccess != null" >
+        #{defaultAccess,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.Host" >
+    update HOST
+    <set >
+      <if test="hostIp != null" >
+        HOST_IP = #{hostIp,jdbcType=VARCHAR},
+      </if>
+      <if test="hostName != null" >
+        HOST_NAME = #{hostName,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpCommunity != null" >
+        SNMP_COMMUNITY = #{snmpCommunity,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpVersion != null" >
+        SNMP_VERSION = #{snmpVersion,jdbcType=BIT},
+      </if>
+      <if test="snmpUserName != null" >
+        SNMP_USER_NAME = #{snmpUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpPassword != null" >
+        SNMP_PASSWORD = #{snmpPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpAuthProtocol != null" >
+        SNMP_AUTH_PROTOCOL = #{snmpAuthProtocol,jdbcType=CHAR},
+      </if>
+      <if test="snmpPrivPassphrase != null" >
+        SNMP_PRIV_PASSPHRASE = #{snmpPrivPassphrase,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpPrivProtocol != null" >
+        SNMP_PRIV_PROTOCOL = #{snmpPrivProtocol,jdbcType=CHAR},
+      </if>
+      <if test="snmpContext != null" >
+        SNMP_CONTEXT = #{snmpContext,jdbcType=VARCHAR},
+      </if>
+      <if test="snmpPort != null" >
+        SNMP_PORT = #{snmpPort,jdbcType=INTEGER},
+      </if>
+      <if test="snmpTimeout != null" >
+        SNMP_TIMEOUT = #{snmpTimeout,jdbcType=INTEGER},
+      </if>
+      <if test="availabilityMethod != null" >
+        AVAILABILITY_METHOD = #{availabilityMethod,jdbcType=SMALLINT},
+      </if>
+      <if test="pingMethod != null" >
+        PING_METHOD = #{pingMethod,jdbcType=SMALLINT},
+      </if>
+      <if test="pingPort != null" >
+        PING_PORT = #{pingPort,jdbcType=INTEGER},
+      </if>
+      <if test="pingTimeout != null" >
+        PING_TIMEOUT = #{pingTimeout,jdbcType=INTEGER},
+      </if>
+      <if test="pingRetries != null" >
+        PING_RETRIES = #{pingRetries,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="statusFailDate != null" >
+        STATUS_FAIL_DATE = #{statusFailDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="statusRecDate != null" >
+        STATUS_REC_DATE = #{statusRecDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="statusLastError != null" >
+        STATUS_LAST_ERROR = #{statusLastError,jdbcType=VARCHAR},
+      </if>
+      <if test="minTime != null" >
+        MIN_TIME = #{minTime,jdbcType=DECIMAL},
+      </if>
+      <if test="maxTime != null" >
+        MAX_TIME = #{maxTime,jdbcType=DECIMAL},
+      </if>
+      <if test="curTime != null" >
+        CUR_TIME = #{curTime,jdbcType=DECIMAL},
+      </if>
+      <if test="avgTime != null" >
+        AVG_TIME = #{avgTime,jdbcType=DECIMAL},
+      </if>
+      <if test="availability != null" >
+        AVAILABILITY = #{availability,jdbcType=DECIMAL},
+      </if>
+      <if test="notes != null" >
+        NOTES = #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="defaultAccess != null" >
+        NOTES = #{defaultAccess,jdbcType=INTEGER},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.Host" >
+    update HOST
+    set HOST_IP = #{hostIp,jdbcType=VARCHAR},
+      HOST_NAME = #{hostName,jdbcType=VARCHAR},
+      SNMP_COMMUNITY = #{snmpCommunity,jdbcType=VARCHAR},
+      SNMP_VERSION = #{snmpVersion,jdbcType=BIT},
+      SNMP_USER_NAME = #{snmpUserName,jdbcType=VARCHAR},
+      SNMP_PASSWORD = #{snmpPassword,jdbcType=VARCHAR},
+      SNMP_AUTH_PROTOCOL = #{snmpAuthProtocol,jdbcType=CHAR},
+      SNMP_PRIV_PASSPHRASE = #{snmpPrivPassphrase,jdbcType=VARCHAR},
+      SNMP_PRIV_PROTOCOL = #{snmpPrivProtocol,jdbcType=CHAR},
+      SNMP_CONTEXT = #{snmpContext,jdbcType=VARCHAR},
+      SNMP_PORT = #{snmpPort,jdbcType=INTEGER},
+      SNMP_TIMEOUT = #{snmpTimeout,jdbcType=INTEGER},
+      AVAILABILITY_METHOD = #{availabilityMethod,jdbcType=SMALLINT},
+      PING_METHOD = #{pingMethod,jdbcType=SMALLINT},
+      PING_PORT = #{pingPort,jdbcType=INTEGER},
+      PING_TIMEOUT = #{pingTimeout,jdbcType=INTEGER},
+      PING_RETRIES = #{pingRetries,jdbcType=INTEGER},
+      STATUS = #{status,jdbcType=TINYINT},
+      STATUS_FAIL_DATE = #{statusFailDate,jdbcType=TIMESTAMP},
+      STATUS_REC_DATE = #{statusRecDate,jdbcType=TIMESTAMP},
+      STATUS_LAST_ERROR = #{statusLastError,jdbcType=VARCHAR},
+      MIN_TIME = #{minTime,jdbcType=DECIMAL},
+      MAX_TIME = #{maxTime,jdbcType=DECIMAL},
+      CUR_TIME = #{curTime,jdbcType=DECIMAL},
+      AVG_TIME = #{avgTime,jdbcType=DECIMAL},
+      AVAILABILITY = #{availability,jdbcType=DECIMAL},
+      NOTES = #{notes,jdbcType=VARCHAR},
+      DEFAULT_ACCESS = #{defaultAccess,jdbcType=INTEGER}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateHostEnable" parameterType="java.util.List" >
+	update HOST set STATUS = 1 where ID in 
+  	<foreach item="id" index="index" collection="uuidList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+  
+  <update id="updateHostDisable" parameterType="java.util.List" >
+	update HOST set STATUS = 0 where ID in 
+  	<foreach item="id" index="index" collection="uuidList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+  
+  <update id="updateHostWorkStatusByIP">
+	update HOST set HOST_WORK_STATUS = #{hostWorkStatus,jdbcType=INTEGER} 
+	where  HOST_IP = #{hostIp,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="getHostCountByWorkStatus" resultType="java.lang.Long">
+  	select count(1) from HOST
+  	where HOST_WORK_STATUS = #{workStatus}
+  </select>
+</mapper>

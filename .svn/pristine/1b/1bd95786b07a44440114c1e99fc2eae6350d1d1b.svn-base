@@ -1,0 +1,168 @@
+package info.zznet.znms.web.module.screen;
+
+import info.zznet.znms.base.common.ZNMSLogger;
+import info.zznet.znms.base.constants.SystemConstants;
+import info.zznet.znms.base.dao.ExportLinkMapper;
+import info.zznet.znms.base.entity.ExportLink;
+import info.zznet.znms.base.rrd.bean.Graph;
+import info.zznet.znms.base.rrd.bean.SubItem;
+import info.zznet.znms.base.rrd.core.RrdFetcher;
+import info.zznet.znms.base.rrd.exception.RrdQueryException;
+import info.zznet.znms.base.util.UUIDGenerator;
+import info.zznet.znms.web.WebRuntimeData;
+import info.zznet.znms.web.module.screen.bean.ExportStreamInfo;
+import info.zznet.znms.web.module.screen.bean.OnlineUserInfo;
+import info.zznet.znms.web.module.screen.bean.UrlRanking;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+@RequestMapping("/screen")
+public class ScreenController {
+	private static final String VIEW = "/screen/screen";
+	
+	@Autowired
+	private ExportLinkMapper exportLinkMapper;
+	private WebRuntimeData webRuntimeData = WebRuntimeData.instance;
+	
+	@RequestMapping({"","/"})
+	public ModelAndView init(){
+		ModelAndView mav = new ModelAndView(VIEW);
+		mav.addObject("leftUp", getOnlineUserCount());
+		mav.addObject("rightUp", getNetHealthPoint());
+		List<ExportStreamInfo> exportStreamInfoList = getExportStreamInfo();
+		mav.addObject("leftDownJson", JSONArray.fromObject(exportStreamInfoList).toString());
+		mav.addObject("leftDown", exportStreamInfoList);
+		Map<String, Object> rightDownMap = getUrlRanking();
+		mav.addObject("rightDownJson", JSONObject.fromObject(rightDownMap).toString());
+		mav.addObject("rightDown", rightDownMap);
+		return mav;
+	}
+	
+	@RequestMapping(value = "/getLeftUpAreaData", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+	@ResponseBody
+	public OnlineUserInfo getLeftUpAreaData(){	
+		return getOnlineUserCount();
+	}
+	
+	@RequestMapping(value = "/getRightUpAreaData", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+	@ResponseBody
+	public int getRightUpAreaData(){
+		return getNetHealthPoint();
+	}
+	
+	private Map<String, Object> getUrlRanking(){
+		List<UrlRanking> urlRankingList = webRuntimeData.getUrlRankingList();
+		List<UrlRanking> _urlRankingList = new ArrayList<UrlRanking>();
+		long total = 0l;
+		if(urlRankingList != null) {
+			int i=0;
+			for(UrlRanking urlRanking : urlRankingList) {
+				if(i>=5){
+					break;
+				}
+				total += urlRanking.getCount();
+				_urlRankingList.add(urlRanking);
+				i++;
+			}
+		}
+		Map<String, Object> retVal = new HashMap<String, Object>();
+		retVal.put("urlRankingList", _urlRankingList);
+		retVal.put("total", total);
+		return retVal;
+	}
+	
+	/**
+	 * 获取网络健康指数
+	 * @return
+	 */
+	private int getNetHealthPoint(){
+		return webRuntimeData.getNetworkHealth();
+	}
+	
+	/**
+	 * 获取在线数
+	 * @return
+	 */
+	private OnlineUserInfo getOnlineUserCount(){
+		return webRuntimeData.getOnlineUserInfo();
+	}
+	
+	/**
+	 * 获取出口流量信息
+	 * @return
+	 */
+	private List<ExportStreamInfo> getExportStreamInfo(){
+		List<ExportStreamInfo> exportStreamInfoList = new ArrayList<ExportStreamInfo>();
+		
+		List<ExportLink> exportLinkList = exportLinkMapper.findLatestThree();
+		if(exportLinkList == null) {
+			return exportStreamInfoList;
+		}
+		
+		Calendar now = Calendar.getInstance();
+		Calendar oneHourAgo = Calendar.getInstance();
+		now.set(Calendar.SECOND, 0);
+		now.set(Calendar.MILLISECOND, 0);
+		oneHourAgo.set(Calendar.SECOND, 0);
+		oneHourAgo.set(Calendar.MILLISECOND, 0);
+		oneHourAgo.add(Calendar.MINUTE, -60);
+		
+		for(ExportLink exportLink : exportLinkList){
+			try {
+				Graph graph = RrdFetcher.fetchDataAndConvertToGraph(
+						SystemConstants.TEMPLATE_NAME_NET_STREAM,
+						exportLink.getGraphUuid(), oneHourAgo.getTimeInMillis(),
+						now.getTimeInMillis());
+				if(graph == null) {
+					continue;
+				}
+				ExportStreamInfo exportStreamInfo = new ExportStreamInfo();
+				exportStreamInfo.setDivId(UUIDGenerator.getGUID());
+				exportStreamInfo.setGraph(graph);
+				exportStreamInfo.setName(exportLink.getExportLinkDescription());
+				exportStreamInfo.setMaxBandWidth(exportLink.getMaxBandWidth());
+				List<SubItem> subItems = graph.getData();
+				if(subItems == null) {
+					exportStreamInfo.setUpStream(0d);
+					exportStreamInfo.setDownStream(0d);
+				} else {
+					SubItem upStream = subItems.get(0);
+					List<String> data = upStream.getData();
+					if(data == null) {
+						exportStreamInfo.setUpStream(0d);
+					} else {
+						exportStreamInfo.setUpStream(Double.parseDouble(data.get(data.size() - 1)));
+					}
+					SubItem downStream = subItems.get(1);
+					data = downStream.getData();
+					if(data == null) {
+						exportStreamInfo.setDownStream(0d);
+					} else {
+						exportStreamInfo.setDownStream(Double.parseDouble(data.get(data.size() - 1)));
+					}
+				}
+				
+				exportStreamInfoList.add(exportStreamInfo);
+			} catch (RrdQueryException e) {
+				ZNMSLogger.error(e);
+				continue;
+			}
+		}
+		return exportStreamInfoList;
+	}
+}

@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.ThresholdValueMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.ThresholdValue" >
+    <id column="THRESHOLD_VALUE_UUID" property="thresholdValueUuid" jdbcType="VARCHAR" />
+    <result column="HOST_UUID" property="hostUuid" jdbcType="VARCHAR" />
+    <result column="GRAPH_UUID" property="graphUuid" jdbcType="VARCHAR" />
+    <result column="FLOW_DIRECTION" property="flowDirection" jdbcType="INTEGER" />
+    <result column="THRESHOLD_VALUE_NAME" property="thresholdValueName" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="INTEGER" />
+    <result column="WARNING_HIGH_THRESHOLD_VALUE" property="warningHighThresholdValue" jdbcType="DECIMAL" />
+    <result column="WARNING_LOW_THRESHOLD_VALUE" property="warningLowThresholdValue" jdbcType="DECIMAL" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <collection property="host" column="HOST_UUID" select="info.zznet.znms.base.dao.HostMapper.selectByPrimaryKey"></collection>
+    <collection property="graph" column="GRAPH_UUID" select="info.zznet.znms.base.dao.GraphMapper.selectByPrimaryKey"></collection>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    THRESHOLD_VALUE_UUID, HOST_UUID, GRAPH_UUID, FLOW_DIRECTION, THRESHOLD_VALUE_NAME, 
+    STATUS, WARNING_HIGH_THRESHOLD_VALUE, WARNING_LOW_THRESHOLD_VALUE, CREATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from THRESHOLD_VALUE
+    where THRESHOLD_VALUE_UUID = #{thresholdValueUuid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findPageList" resultMap="BaseResultMap"  parameterType="info.zznet.znms.web.module.common.page.Pager">
+	SELECT 
+	<include refid="Base_Column_List" />
+    FROM THRESHOLD_VALUE 
+    <where> 
+    	1=1
+   	 <if test="condition != null">
+		<foreach collection="condition" item="item">
+	  		<if test="item.value != null and item.value !=''">
+	  			<if test="item.key == 'thresholdValueName'">
+	  				<![CDATA[AND THRESHOLD_VALUE_NAME like CONCAT('%',#{item.value},'%') ]]>  
+	  			</if>
+		  		<if test="item.key == 'hostUuid' and item.value != '-1'">
+		  		   <![CDATA[and HOST_UUID = #{item.value}]]>
+		  		</if>
+		  		<if test="item.key == 'graphUuid' and item.value != '-1'">
+		  		   <![CDATA[and GRAPH_UUID = #{item.value}]]>
+		  		</if>
+		  		<if test="item.key == 'status' and item.value != -1">
+		  		   <![CDATA[and STATUS = #{item.value}]]>
+		  		</if>
+	  		</if>
+  		</foreach>
+	</if>
+  	</where> 
+  		ORDER BY CREATE_TIME DESC	
+  		limit #{pager.limit} offset #{pager.offset}
+	</select>
+	
+	<select id="getCount" resultType="java.lang.Long">
+		SELECT count(THRESHOLD_VALUE_UUID) FROM THRESHOLD_VALUE
+    <where> 
+    	1=1
+   	 <if test="condition != null">
+		<foreach collection="condition" item="item">
+	  		<if test="item.value != null and item.value !=''">
+	  			<if test="item.key == 'thresholdValueName'">
+	  				<![CDATA[AND THRESHOLD_VALUE_NAME like CONCAT('%',#{item.value},'%') ]]>  
+	  			</if>
+		  		<if test="item.key == 'hostUuid' and item.value != '-1'">
+		  		   <![CDATA[and HOST_UUID = #{item.value}]]>
+		  		</if>
+		  		<if test="item.key == 'graphUuid' and item.value != '-1'">
+		  		   <![CDATA[and GRAPH_UUID = #{item.value}]]>
+		  		</if>
+		  		<if test="item.key == 'status' and item.value != -1">
+		  		   <![CDATA[and STATUS = #{item.value}]]>
+		  		</if>
+	  		</if>
+  		</foreach>
+	</if>
+  	</where> 
+	</select>
+	
+  <select id="findAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from THRESHOLD_VALUE
+  </select>
+  
+  <select id="findByTime" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from THRESHOLD_VALUE WHERE
+     <![CDATA[CREATE_TIME >= #{startDate,jdbcType=VARCHAR}]]>
+     <![CDATA[and CREATE_TIME <= #{endDate,jdbcType=VARCHAR}]]>
+  </select>
+  
+  <select id="checkThresholdValueName" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from THRESHOLD_VALUE
+    where THRESHOLD_VALUE_NAME = #{thresholdValueName, jdbcType=VARCHAR}
+    and THRESHOLD_VALUE_UUID != #{thresholdValueUuid, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="chekcIsExistValue" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from THRESHOLD_VALUE
+    where HOST_UUID = #{hostUuid, jdbcType=VARCHAR}
+    and GRAPH_UUID = #{graphUuid, jdbcType=VARCHAR}
+    and FLOW_DIRECTION = #{flowDirection, jdbcType=INTEGER}
+  </select>
+  
+  <select id="findByGrapUuid" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select 
+    <include refid="Base_Column_List" />
+    from THRESHOLD_VALUE
+    where GRAPH_UUID = #{graphUuid, jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from THRESHOLD_VALUE
+    where THRESHOLD_VALUE_UUID = #{thresholdValueUuid,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteByHostUuid" parameterType="java.lang.String" >
+    delete from THRESHOLD_VALUE
+    where HOST_UUID = #{hostUuid,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteByGraphUuid" parameterType="java.lang.String" >
+    delete from THRESHOLD_VALUE
+    where GRAPH_UUID = #{graphUuid,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.ThresholdValue" >
+    insert into THRESHOLD_VALUE (THRESHOLD_VALUE_UUID, HOST_UUID, GRAPH_UUID, 
+      FLOW_DIRECTION, THRESHOLD_VALUE_NAME, STATUS, 
+      WARNING_HIGH_THRESHOLD_VALUE, 
+      WARNING_LOW_THRESHOLD_VALUE, CREATE_TIME)
+    values (#{thresholdValueUuid,jdbcType=VARCHAR}, #{hostUuid,jdbcType=VARCHAR}, #{graphUuid,jdbcType=VARCHAR}, 
+      #{flowDirection,jdbcType=INTEGER}, #{thresholdValueName,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{warningHighThresholdValue,jdbcType=DECIMAL}, #{warningLowThresholdValue,jdbcType=DECIMAL}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.ThresholdValue" >
+    insert into THRESHOLD_VALUE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="thresholdValueUuid != null" >
+        THRESHOLD_VALUE_UUID,
+      </if>
+      <if test="hostUuid != null" >
+        HOST_UUID,
+      </if>
+      <if test="graphUuid != null" >
+        GRAPH_UUID,
+      </if>
+      <if test="flowDirection != null" >
+        FLOW_DIRECTION,
+      </if>
+      <if test="thresholdValueName != null" >
+        THRESHOLD_VALUE_NAME,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="warningHighThresholdValue != null" >
+        WARNING_HIGH_THRESHOLD_VALUE,
+      </if>
+      <if test="warningLowThresholdValue != null" >
+        WARNING_LOW_THRESHOLD_VALUE,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="thresholdValueUuid != null" >
+        #{thresholdValueUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="hostUuid != null" >
+        #{hostUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="graphUuid != null" >
+        #{graphUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="flowDirection != null" >
+        #{flowDirection,jdbcType=INTEGER},
+      </if>
+      <if test="thresholdValueName != null" >
+        #{thresholdValueName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="warningHighThresholdValue != null" >
+        #{warningHighThresholdValue,jdbcType=DECIMAL},
+      </if>
+      <if test="warningLowThresholdValue != null" >
+        #{warningLowThresholdValue,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.ThresholdValue" >
+    update THRESHOLD_VALUE
+    <set >
+      <if test="hostUuid != null" >
+        HOST_UUID = #{hostUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="graphUuid != null" >
+        GRAPH_UUID = #{graphUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="flowDirection != null" >
+        FLOW_DIRECTION = #{flowDirection,jdbcType=INTEGER},
+      </if>
+      <if test="thresholdValueName != null" >
+        THRESHOLD_VALUE_NAME = #{thresholdValueName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="warningHighThresholdValue != null" >
+        WARNING_HIGH_THRESHOLD_VALUE = #{warningHighThresholdValue,jdbcType=DECIMAL},
+      </if>
+      <if test="warningLowThresholdValue != null" >
+        WARNING_LOW_THRESHOLD_VALUE = #{warningLowThresholdValue,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where THRESHOLD_VALUE_UUID = #{thresholdValueUuid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.ThresholdValue" >
+    update THRESHOLD_VALUE
+    set HOST_UUID = #{hostUuid,jdbcType=VARCHAR},
+      GRAPH_UUID = #{graphUuid,jdbcType=VARCHAR},
+      FLOW_DIRECTION = #{flowDirection,jdbcType=INTEGER},
+      THRESHOLD_VALUE_NAME = #{thresholdValueName,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=INTEGER},
+      WARNING_HIGH_THRESHOLD_VALUE = #{warningHighThresholdValue,jdbcType=DECIMAL},
+      WARNING_LOW_THRESHOLD_VALUE = #{warningLowThresholdValue,jdbcType=DECIMAL}
+    where THRESHOLD_VALUE_UUID = #{thresholdValueUuid,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateThresholdValueEnable" parameterType="java.util.List" >
+	update THRESHOLD_VALUE set STATUS = 1 where THRESHOLD_VALUE_UUID in 
+  	<foreach item="id" index="index" collection="uuidList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+  
+  <update id="updateThresholdValueDisable" parameterType="java.util.List" >
+	update THRESHOLD_VALUE set STATUS = 0 where THRESHOLD_VALUE_UUID in 
+  	<foreach item="id" index="index" collection="uuidList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+  
+</mapper>

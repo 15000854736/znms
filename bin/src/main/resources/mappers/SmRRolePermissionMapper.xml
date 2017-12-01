@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.SmRRolePermissionMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.SmRRolePermission" >
+    <id column="R_ROLE_PERMISSION_UUID" property="rRolePermissionUuid" jdbcType="VARCHAR" />
+    <result column="ROLE_UUID" property="roleUuid" jdbcType="VARCHAR" />
+    <result column="PERMISSION_UUID" property="permissionUuid" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    R_ROLE_PERMISSION_UUID, ROLE_UUID, PERMISSION_UUID
+  </sql>
+  <select id="findByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    SELECT 
+    <include refid="Base_Column_List" />
+    FROM SM_R_ROLE_PERMISSION
+    WHERE R_ROLE_PERMISSION_UUID = #{rRolePermissionUuid,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    DELETE FROM SM_R_ROLE_PERMISSION
+    WHERE R_ROLE_PERMISSION_UUID = #{rRolePermissionUuid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.SmRRolePermission" >
+    INSERT INTO SM_R_ROLE_PERMISSION (R_ROLE_PERMISSION_UUID, ROLE_UUID, PERMISSION_UUID
+      )
+    VALUES (#{rRolePermissionUuid,jdbcType=VARCHAR}, #{roleUuid,jdbcType=VARCHAR}, #{permissionUuid,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.SmRRolePermission" >
+    INSERT INTO SM_R_ROLE_PERMISSION
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="rRolePermissionUuid != null" >
+        R_ROLE_PERMISSION_UUID,
+      </if>
+      <if test="roleUuid != null" >
+        ROLE_UUID,
+      </if>
+      <if test="permissionUuid != null" >
+        PERMISSION_UUID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="rRolePermissionUuid != null" >
+        #{rRolePermissionUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="roleUuid != null" >
+        #{roleUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="permissionUuid != null" >
+        #{permissionUuid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.SmRRolePermission" >
+    UPDATE SM_R_ROLE_PERMISSION
+    <set >
+      <if test="roleUuid != null" >
+        ROLE_UUID = #{roleUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="permissionUuid != null" >
+        PERMISSION_UUID = #{permissionUuid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    WHERE R_ROLE_PERMISSION_UUID = #{rRolePermissionUuid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.SmRRolePermission" >
+    UPDATE SM_R_ROLE_PERMISSION
+    SET ROLE_UUID = #{roleUuid,jdbcType=VARCHAR},
+      PERMISSION_UUID = #{permissionUuid,jdbcType=VARCHAR}
+    WHERE R_ROLE_PERMISSION_UUID = #{rRolePermissionUuid,jdbcType=VARCHAR}
+  </update>
+  
+  <delete id="deleteByRoleId" parameterType="java.lang.String">
+  DELETE FROM SM_R_ROLE_PERMISSION
+  WHERE ROLE_UUID = #{roleId}
+  </delete>
+  
+  <delete id="deleteByRoleIdList" parameterType="java.util.List">
+	delete from SM_R_ROLE_PERMISSION WHERE ROLE_UUID IN
+	<foreach collection="list" index="index" item="id" open="("
+		separator="," close=")">
+		#{id}
+	</foreach>
+</delete>
+  
+  <insert id="batchInsert" parameterType="info.zznet.znms.base.entity.SmRRolePermission" >
+    insert into SM_R_ROLE_PERMISSION (R_ROLE_PERMISSION_UUID, ROLE_UUID, PERMISSION_UUID
+      )
+    values
+	<foreach collection="list" item="item" separator=",">
+		(#{item.rRolePermissionUuid,jdbcType=VARCHAR}, 
+		#{item.roleUuid,jdbcType=VARCHAR}, 
+		#{item.permissionUuid,jdbcType=VARCHAR})
+	</foreach>
+  </insert>
+  
+</mapper>

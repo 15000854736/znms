@@ -1,0 +1,55 @@
+/**
+ * 
+ */
+package info.zznet.znms.web.start;
+
+import info.zznet.znms.base.dao.ThresholdValueMapper;
+import info.zznet.znms.base.entity.ThresholdValue;
+import info.zznet.znms.base.util.SpringContextUtil;
+import info.zznet.znms.spider.Engine;
+import info.zznet.znms.spider.bean.ScanResult;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author dell001
+ *
+ */
+public class ThresholdValueThread extends Thread{
+	public static Map<String, List<ThresholdValue>> map = new HashMap<String, List<ThresholdValue>>();
+
+	public void run(){
+		Engine engine = (Engine) SpringContextUtil.getBean("engine");
+		ThresholdValueMapper thresholdValueMapper = (ThresholdValueMapper) SpringContextUtil.getBean("thresholdValueMapper");
+		updateGraphThresholdValueMap(thresholdValueMapper);
+		while (true) {
+			ScanResult result = new ScanResult();
+			try {
+				result = engine.otherQueue.take();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			//检查是否触发相关阀值
+			engine.checkThresholdValueAndOperation(result, map);
+		}
+	}
+	
+	public static void updateGraphThresholdValueMap(ThresholdValueMapper thresholdValueMapper){
+		List<ThresholdValue> list = thresholdValueMapper.findAll();
+		for (ThresholdValue thresholdValue : list) {
+			String key = thresholdValue.getGraphUuid();
+			List<ThresholdValue> valueList = new ArrayList<ThresholdValue>();
+			if(map.containsKey(key)){
+				valueList = map.get(key);
+				valueList.add(thresholdValue);
+				map.put(key, valueList);
+			}else{
+				valueList.add(thresholdValue);
+				map.put(key, valueList);
+			}
+		}
+	}
+}

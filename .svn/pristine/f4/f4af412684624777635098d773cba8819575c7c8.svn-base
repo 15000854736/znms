@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.GraphExtendMapper" >
+  <resultMap id="GraphResultMap" type="info.zznet.znms.web.module.monitor.bean.GraphItem" >
+    <id column="GRAPH_UUID" property="graphUuid" jdbcType="VARCHAR" />
+    <result column="GRAPH_TYPE" property="graphType" jdbcType="INTEGER" />
+    <result column="HOST_UUID" property="hostUuid" jdbcType="VARCHAR" />
+    <result column="HOST_NAME" property="hostName" jdbcType="VARCHAR" />
+    <result column="HOST_IP" property="hostIp" jdbcType="VARCHAR" />
+    <result column="GRAPH_NAME" property="graphName" jdbcType="VARCHAR" />
+    <result column="GRAPH_TEMPLATE_SIMPLE_NAME" property="graphSimpleName" jdbcType="VARCHAR" />
+    <result column="GRAPH_TEMPLATE_ID" property="templateId" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="GraphTreeResultMap" type="info.zznet.znms.base.entity.GraphTree" >
+    <id column="GRAPH_TREE_UUID" property="graphTreeUuid" jdbcType="VARCHAR" />
+    <result column="GRAPH_TREE_NAME" property="graphTreeName" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="GraphTreeItemResultMap" type="info.zznet.znms.web.module.monitor.bean.GraphTreeItemBean" >
+    <id column="GRAPH_TREE_ITEM_UUID" property="graphTreeItemUuid" jdbcType="VARCHAR" />
+    <result column="TITLE" property="title" jdbcType="VARCHAR" />
+    <result column="PARENT_UUID" property="parentUuid" jdbcType="VARCHAR" />
+    <result column="GRAPH_TREE_ITEM_TYPE" property="graphTreeItemType" jdbcType="INTEGER" />
+    <result column="HOST_Uuid" property="hostUuid" jdbcType="VARCHAR" />
+    <result column="HOST_IP" property="hostIp" jdbcType="VARCHAR" />
+    <result column="HOST_NAME" property="hostName" jdbcType="VARCHAR" />
+  </resultMap>
+  <select id="findPagedData" resultMap="GraphResultMap">
+   		select 
+   			t1.GRAPH_UUID,t1.GRAPH_TYPE,t1.HOST_UUID,t2.HOST_NAME, t1.HOST_IP,t1.GRAPH_NAME,t3.GRAPH_TEMPLATE_SIMPLE_NAME,t1.GRAPH_TEMPLATE_ID 
+		from 
+			GRAPH t1 
+		inner join 
+			(select 
+				a.HOST_NAME, a.ID 
+			from  `HOST` a, 
+				<choose>
+					<when test="condition.hostUuid != null and condition.hostUuid != ''">
+						(select #{condition.hostUuid} as HOST_ID) b
+					</when>
+					<when test="condition.subNodeId != null and condition.subNodeId != ''">
+						(((select HOST_ID from GRAPH_TREE_ITEM where GRAPH_TREE_ITEM_UUID = #{condition.subNodeId} and GRAPH_TREE_ITEM_TYPE=2) 
+						union
+						(select HOST_ID from GRAPH_TREE_ITEM where PARENT_UUID = #{condition.subNodeId} and GRAPH_TREE_ITEM_TYPE=2)) 
+						union
+						(select HOST_ID from GRAPH_TREE_ITEM where PARENT_UUID in(select GRAPH_TREE_ITEM_UUID from GRAPH_TREE_ITEM where PARENT_UUID = #{condition.subNodeId} and GRAPH_TREE_ITEM_TYPE=1))) b
+					</when>
+					<when test="condition.hostGroup != null and condition.hostGroup != ''">
+						((select HOST_ID from GRAPH_TREE_ITEM where PARENT_UUID = #{condition.hostGroup} and GRAPH_TREE_ITEM_TYPE=2) 
+						union
+						(select HOST_ID from GRAPH_TREE_ITEM where PARENT_UUID in(select GRAPH_TREE_ITEM_UUID from GRAPH_TREE_ITEM where PARENT_UUID = #{condition.hostGroup} and GRAPH_TREE_ITEM_TYPE=1))) b				
+					</when>
+					<otherwise>
+						(select ID as HOST_ID from `HOST`) b
+					</otherwise>
+				</choose>
+			where a.ID=b.HOST_ID) t2
+		on t1.HOST_UUID = t2.ID
+			
+			
+			
+		left join
+			GRAPH_TEMPLATE t3
+		on t1.GRAPH_TEMPLATE_ID = t3.GRAPH_TEMPLATE_ID
+		inner join
+			RRD_DATA_INFO t4 
+		on t1.GRAPH_UUID = t4.RRD_DATA_ID and ((t1.GRAPH_TYPE=1 and t3.GRAPH_TEMPLATE_SIMPLE_NAME = t4.RRD_TEMPLATE_NAME) or t1.GRAPH_TYPE=2)
+		where
+			1=1
+		<if test="condition != null">
+			<if test="condition.graphTemplateId != null and condition.graphTemplateId != ''">
+				and t1.GRAPH_TEMPLATE_ID = #{condition.graphTemplateId}
+			</if>
+			<if test="condition.graphName != null and condition.graphName != ''">
+				and t1.GRAPH_NAME like CONCAT('%', #{condition.graphName}, '%')
+			</if>
+		</if>
+		order by
+			HOST_UUID, GRAPH_TEMPLATE_ID
+  </select>
+  <select id="findAllTrees" resultMap="GraphTreeResultMap">
+  	select GRAPH_TREE_UUID, GRAPH_TREE_NAME from GRAPH_TREE
+  	order by GRAPH_TREE_UUID
+  </select>
+  <select id="findByParentId" resultMap="GraphTreeItemResultMap">
+  	select t1.GRAPH_TREE_ITEM_UUID, t1.TITLE, t1.PARENT_UUID, t1.GRAPH_TREE_ITEM_TYPE, t1.HOST_ID, t2.HOST_IP, t2.HOST_NAME
+  	from GRAPH_TREE_ITEM t1 left join `HOST` t2 on t1.HOST_ID = t2.ID
+  	where t1.PARENT_UUID = #{id}
+  	order by PARENT_UUID, `SORT`
+  </select>
+</mapper>

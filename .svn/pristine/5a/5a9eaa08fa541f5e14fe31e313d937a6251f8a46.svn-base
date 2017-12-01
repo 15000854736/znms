@@ -1,0 +1,38 @@
+/*部分样式已包含在znms_style.css中*/
+.export_utilization{height:500px;float:left;}
+#exportFlow{
+    width:1177px;
+    height: 500px;
+}
+.exportPlate{
+    width:310px;
+    height:200px;
+}
+.exportLine{
+    width:310px;
+    height:130px ;
+}
+
+.znms_sbimg_icon img{
+    margin: 0px;
+    width:60px;
+}
+
+.traffic_data li{
+    margin:0 10px !important;
+}
+
+.nms_data_statistics{
+    height: 250px ;
+    width: 480px;
+    margin-top: -30px;
+}
+
+.online_user_sort li{
+    margin: 40px 0px;
+}
+
+#mainDeviceMonitorDiv{
+    width:1177px;
+    height: 250px;
+}

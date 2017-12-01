@@ -1,0 +1,17 @@
+host.snmpOption.snmpPort=161
+host.snmpOption.snmpTimeout=500
+host.selectiveOption.checkTimeout=400
+host.selectiveOption.pingRetries=1
+host.selectiveOption.pingMethod=2
+host.selectiveOption.pingPort=23
+
+znms.config.path=/opt/znms/config
+
+znms.topo.path=${znms.file.path}/topo/znms-topo.txt
+znms.import.path=${znms.file.path}/import-result/
+znms.image.path=${znms.file.path}/image/
+znms.rdd.path=${znms.file.path}/rrd
+
+school.map.max.size=10240
+
+znms.ip=localhost

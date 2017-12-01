@@ -1,0 +1,87 @@
+<%@ taglib uri="http://www.znet.info/tag/znms/view" prefix="s"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%
+	String basePathUrl = request.getContextPath();
+%>
+<div class="nms_logo">
+	<img src="<%=basePathUrl %>/images/indexlogo.png" >
+	<ul class="top_loginbox">
+		<li>
+			<span class="fui-user"></span>
+			欢迎您，<a href="#">${sessionScope.SESSION_BEAN.smAdmin.adminId}</a>
+		</li>
+		<li>
+			<a href="${pageContext.request.contextPath }/host?hostWorkStatus=0">宕机<span class="top_wrong_font" id="bad_status_host_count"></span></a>
+		</li>
+		<c:if test="${mapImage == null }">
+		<li>
+			<a href="javascript:void(0);" id="about_system">关于</a>
+		</li>
+		</c:if>
+		<li> 
+			<a href="${pageContext.request.contextPath }/logout"><span class="fui-arrow-right"></span>退出</a>
+		</li>
+	</ul>
+</div>
+<c:if test="${mapImage == null}">
+<div class="layer_box_dummy" style="text-align:center; position: fixed; z-index:9999; width:100%; height:100%;display: none !important;" id="about_system_layer">
+	<div class="layer_center">
+		<div class="layer_text bg_aboutme">
+			<div class="layer_text_bg">
+				<h1>
+					<div class="close" onclick="about_system_layer.style.display='none'">
+						<span class="fui-cross"></span>
+					</div>
+					<span><img src="<%=basePathUrl%>/images/loginlogo.png" width="200"
+						height="42"></span>
+				</h1>
+				<table border="0" cellspacing="0" cellpadding="0"
+					class=" padding_10">
+					<tr>
+						<td class="nms_data_right font_14px" id="system_version"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="layer_bg filter"></div>
+</div>
+</c:if>
+<script>
+	refreshBadStatusHostCount();
+	setInterval(function(){
+		refreshBadStatusHostCount();
+	}, 60000)
+	function refreshBadStatusHostCount(){
+		$.ajax({
+			url:"<%=basePathUrl%>/home/getBadStatusHostCount",
+			type:"POST",
+			success:function(data){
+				if(data > 0) {
+					$("#bad_status_host_count").text("("+data+")");
+					$("#bad_status_host_count").addClass("top_wrong_font");
+				} else {
+					$("#bad_status_host_count").text("");
+					$("#bad_status_host_count").removeClass("top_wrong_font");
+				}
+			}
+		})
+	}
+	<c:if test="${mapImage == null}">
+	$(document).ready(function(){
+		if(document.URL)
+		$("#about_system").click(function(){
+			$("#about_system_layer").css("display","table")	
+		});
+		$.ajax({
+			url:"<%=basePathUrl%>/home/getSystemVersion",
+			type:"POST",
+			success:function(data){
+				$("#system_version").text("版本号："+data);
+			}
+		});
+	})
+	</c:if>
+</script>

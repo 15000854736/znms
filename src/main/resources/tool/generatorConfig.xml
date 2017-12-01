@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration >
+<classPathEntry location="C:\Users\dell001\.m2\repository\mysql\mysql-connector-java\5.1.21\mysql-connector-java-5.1.21.jar" />  
+  <context id="context2" >
+	  <commentGenerator> 
+	    <!-- 是否去除自动生成的注释 true：是 ： false:否 --> 
+	    <property name="suppressAllComments" value="true" /> 
+	  </commentGenerator> 
+    <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://192.168.1.137:3306/znms" userId="znms" password="znms2016" />
+    <javaModelGenerator targetPackage="info.zznet.znms.base.entity" targetProject="znms" />
+    <sqlMapGenerator targetPackage="info.zznet.znms.base.dao" targetProject="znms" />
+    <javaClientGenerator targetPackage="info.zznet.znms.base.dao" targetProject="znms" type="XMLMAPPER" />
+	<table schema=""  tableName="THRESHOLD_VALUE_TRIGGER_SURVEY" enableCountByExample="false"
+		enableUpdateByExample="false" enableDeleteByExample="false"
+		enableSelectByExample="false" selectByExampleQueryId="false">
+	</table>
+<!-- 		<table schema=""  tableName="LI_LOG_INFO" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+<!-- 		<table schema=""  tableName="OI_ORDER_INFO" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+<!-- 		<table schema=""  tableName="OI_PACKAGE_INFO" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+<!-- 		<table schema=""  tableName="PI_PACKAGE_INFO" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+<!-- 		<table schema=""  tableName="RP_MENU_INFO" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+<!-- 		<table schema=""  tableName="RP_PERMISSION_INFO" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+<!-- 		<table schema=""  tableName="RP_ROLE_INFO" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+<!-- 			<table schema=""  tableName="SC_SYSTEM_CONFIG" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+<!-- 			<table schema=""  tableName="SI_SCHOOL_INFO" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+<!-- 	<table schema=""  tableName="R_ADMIN_SCHOOL" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+<!-- 	<table schema=""  tableName="R_ROLE_PERMISSION" enableCountByExample="false" -->
+<!-- 		enableUpdateByExample="false" enableDeleteByExample="false" -->
+<!-- 		enableSelectByExample="false" selectByExampleQueryId="false"> -->
+<!-- 	</table> -->
+  </context>
+</generatorConfiguration>

@@ -1,0 +1,28 @@
+/**
+ * 
+ */
+package info.zznet.znms.web.module.security.service;
+
+import info.zznet.znms.web.module.common.service.BaseService;
+
+import org.springframework.web.servlet.ModelAndView;
+
+/**
+ * @author dell001
+ *
+ */
+public interface HomePageService extends BaseService{
+
+	/**
+	 * 查询首页设备状态图数据
+	 * @return
+	 */
+	void findDeviceData(ModelAndView mv);
+
+	/**
+	 * @param mv
+	 * @return
+	 */
+	void findCpuUsageData(ModelAndView mv);
+
+}

@@ -1,0 +1,47 @@
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : localhost
+Source Server Version : 50151
+Source Host           : localhost:3308
+Source Database       : znms
+
+Target Server Type    : MYSQL
+Target Server Version : 50151
+File Encoding         : 65001
+
+Date: 2015-11-30 13:24:15
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+--  Table structure for `SM_R_ROLE_PERMISSION`
+-- ----------------------------
+DROP TABLE IF EXISTS `SM_R_ROLE_PERMISSION`;
+CREATE TABLE `SM_R_ROLE_PERMISSION` (
+  `R_ROLE_PERMISSION_UUID` varchar(32) COLLATE utf8_bin NOT NULL COMMENT '角色/权限映射ID',
+  `ROLE_UUID` varchar(32) COLLATE utf8_bin DEFAULT NULL COMMENT '角色ID',
+  `PERMISSION_UUID` varchar(32) COLLATE utf8_bin DEFAULT NULL COMMENT '权限ID',
+  PRIMARY KEY (`R_ROLE_PERMISSION_UUID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+--  Records of `SM_R_ROLE_PERMISSION`
+-- ----------------------------
+BEGIN;
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('1', '1', '100');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('2', '1', '110');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('3', '1', '111');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('4', '1', '112');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('5', '1', '113');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('6', '1', '114');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('7', '1', '115');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('8', '1', '130');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('9', '1', '131');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('10', '1', '132');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('11', '1', '133');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('12', '1', '134');
+INSERT INTO `SM_R_ROLE_PERMISSION` VALUES ('13', '1', '135');
+
+COMMIT;

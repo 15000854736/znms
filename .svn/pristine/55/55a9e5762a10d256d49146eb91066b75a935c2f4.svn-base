@@ -1,0 +1,29 @@
+package info.zznet.znms.web.module.screen.service.impl;
+
+import info.zznet.znms.base.dao.ScreenMapper;
+import info.zznet.znms.base.entity.Screen;
+import info.zznet.znms.web.module.common.service.impl.BaseServiceImpl;
+import info.zznet.znms.web.module.screen.service.ScreenService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/**
+ * Created by shenqilei on 2016/11/29.
+ */
+@Transactional(propagation = Propagation.REQUIRED,rollbackFor=Exception.class)
+@Service("screenService")
+public class ScreenServiceImpl extends BaseServiceImpl implements ScreenService{
+
+    @Autowired
+    private ScreenMapper screenMapper;
+
+
+    @Override
+    public List<Screen> findAll() {
+        return screenMapper.findAll();
+    }
+}

@@ -1,0 +1,11 @@
+#\u5171\u901a
+common.system.permission.error.forbidden = \u767b\u5f55\u7528\u6237\u65e0\u6743\u6267\u884c\u6b64\u64cd\u4f5c
+common.ui.button.return=\u8fd4\u56de
+common.ui.button.reset=\u91cd\u7f6e
+common.ui.button.save=\u4fdd\u5b58
+common.ui.button.export=export
+common.ui.button.close=close
+common.ui.label.wrong=wrong
+system.service.status.normal = \u8fd0\u884c\u6b63\u5e38
+system.service.status.busy = \u7e41\u5fd9
+err.captcha=\u9a8c\u8bc1\u7801\u9519\u8bef

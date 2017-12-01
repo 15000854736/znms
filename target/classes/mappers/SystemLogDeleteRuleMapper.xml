@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.SystemLogDeleteRuleMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.SystemLogDeleteRule" >
+    <id column="SYSTEM_LOG_DELETE_RULE_UUID" property="systemLogDeleteRuleUuid" jdbcType="VARCHAR" />
+    <result column="RULE_NAME" property="ruleName" jdbcType="VARCHAR" />
+    <result column="RULE_STATUS" property="ruleStatus" jdbcType="INTEGER" />
+    <result column="MATCH_TYPE" property="matchType" jdbcType="INTEGER" />
+    <result column="MATCH_STRING" property="matchString" jdbcType="VARCHAR" />
+    <result column="NOTE" property="note" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    SYSTEM_LOG_DELETE_RULE_UUID, RULE_NAME, RULE_STATUS, MATCH_TYPE, MATCH_STRING, NOTE, 
+    CREATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYSTEM_LOG_DELETE_RULE
+    where SYSTEM_LOG_DELETE_RULE_UUID = #{systemLogDeleteRuleUuid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findPageList" resultMap="BaseResultMap"  parameterType="info.zznet.znms.web.module.common.page.Pager">
+	SELECT 
+	<include refid="Base_Column_List" />
+    FROM SYSTEM_LOG_DELETE_RULE 
+    <where> 
+    	1=1
+   	 <if test="condition != null">
+		<foreach collection="condition" item="item">
+	  		<if test="item.value != null and item.value !=''">
+	  			<if test="item.key == 'ruleName'">
+	  				<![CDATA[AND RULE_NAME like CONCAT('%',#{item.value},'%') ]]>  
+	  			</if>
+	  			<if test="item.key == 'ruleStatus' and item.value != -1">
+	  				<![CDATA[AND RULE_STATUS = #{item.value} ]]>  
+	  			</if>
+		  		<if test="item.key == 'matchType' and item.value != -1">
+		  		   <![CDATA[and MATCH_TYPE = #{item.value}]]>
+		  		</if>
+	  		</if>
+  		</foreach>
+	</if>
+  	</where> 
+  		ORDER BY CREATE_TIME
+  		limit #{pager.limit} offset #{pager.offset}
+	</select>
+	
+	<select id="getCount" resultType="java.lang.Long">
+		SELECT count(SYSTEM_LOG_DELETE_RULE_UUID) FROM SYSTEM_LOG_DELETE_RULE
+    <where> 
+    	1=1
+   	 <if test="condition != null">
+		<foreach collection="condition" item="item">
+	  		<if test="item.value != null and item.value !=''">
+	  			<if test="item.key == 'ruleName'">
+	  				<![CDATA[AND RULE_NAME like CONCAT('%',#{item.value},'%') ]]>  
+	  			</if>
+	  			<if test="item.key == 'ruleStatus' and item.value != -1">
+	  				<![CDATA[AND RULE_STATUS = #{item.value} ]]>  
+	  			</if>
+		  		<if test="item.key == 'matchType' and item.value != -1">
+		  		   <![CDATA[and MATCH_TYPE = #{item.value}]]>
+		  		</if>
+	  		</if>
+  		</foreach>
+	</if>
+  	</where> 
+	</select>
+	
+  <select id="checkRuleRepeat" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from SYSTEM_LOG_DELETE_RULE
+    where RULE_NAME = #{ruleName,jdbcType=VARCHAR}
+    and SYSTEM_LOG_DELETE_RULE_UUID != #{systemLogDeleteRuleUuid,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from SYSTEM_LOG_DELETE_RULE
+    where SYSTEM_LOG_DELETE_RULE_UUID = #{systemLogDeleteRuleUuid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.SystemLogDeleteRule" >
+    insert into SYSTEM_LOG_DELETE_RULE (SYSTEM_LOG_DELETE_RULE_UUID, RULE_NAME, 
+      RULE_STATUS, MATCH_TYPE, MATCH_STRING, 
+      NOTE, CREATE_TIME)
+    values (#{systemLogDeleteRuleUuid,jdbcType=VARCHAR}, #{ruleName,jdbcType=VARCHAR}, 
+      #{ruleStatus,jdbcType=INTEGER}, #{matchType,jdbcType=INTEGER}, #{matchString,jdbcType=VARCHAR}, 
+      #{note,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.SystemLogDeleteRule" >
+    insert into SYSTEM_LOG_DELETE_RULE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="systemLogDeleteRuleUuid != null" >
+        SYSTEM_LOG_DELETE_RULE_UUID,
+      </if>
+      <if test="ruleName != null" >
+        RULE_NAME,
+      </if>
+      <if test="ruleStatus != null" >
+        RULE_STATUS,
+      </if>
+      <if test="matchType != null" >
+        MATCH_TYPE,
+      </if>
+      <if test="matchString != null" >
+        MATCH_STRING,
+      </if>
+      <if test="note != null" >
+        NOTE,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="systemLogDeleteRuleUuid != null" >
+        #{systemLogDeleteRuleUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleName != null" >
+        #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleStatus != null" >
+        #{ruleStatus,jdbcType=INTEGER},
+      </if>
+      <if test="matchType != null" >
+        #{matchType,jdbcType=INTEGER},
+      </if>
+      <if test="matchString != null" >
+        #{matchString,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null" >
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.SystemLogDeleteRule" >
+    update SYSTEM_LOG_DELETE_RULE
+    <set >
+      <if test="ruleName != null" >
+        RULE_NAME = #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleStatus != null" >
+        RULE_STATUS = #{ruleStatus,jdbcType=INTEGER},
+      </if>
+      <if test="matchType != null" >
+        MATCH_TYPE = #{matchType,jdbcType=INTEGER},
+      </if>
+      <if test="matchString != null" >
+        MATCH_STRING = #{matchString,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null" >
+        NOTE = #{note,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where SYSTEM_LOG_DELETE_RULE_UUID = #{systemLogDeleteRuleUuid,jdbcType=VARCHAR}
+  </update>
+  
+   <update id="updateRuleEnable" parameterType="java.util.List" >
+	update SYSTEM_LOG_DELETE_RULE set RULE_STATUS = 1 where SYSTEM_LOG_DELETE_RULE_UUID in 
+  	<foreach item="id" index="index" collection="uuidList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+  
+  <update id="updateRuleDisable" parameterType="java.util.List" >
+	update SYSTEM_LOG_DELETE_RULE set RULE_STATUS = 0 where SYSTEM_LOG_DELETE_RULE_UUID in 
+  	<foreach item="id" index="index" collection="uuidList" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.SystemLogDeleteRule" >
+    update SYSTEM_LOG_DELETE_RULE
+    set RULE_NAME = #{ruleName,jdbcType=VARCHAR},
+      RULE_STATUS = #{ruleStatus,jdbcType=INTEGER},
+      MATCH_TYPE = #{matchType,jdbcType=INTEGER},
+      MATCH_STRING = #{matchString,jdbcType=VARCHAR},
+      NOTE = #{note,jdbcType=VARCHAR}
+    where SYSTEM_LOG_DELETE_RULE_UUID = #{systemLogDeleteRuleUuid,jdbcType=VARCHAR}
+  </update>
+</mapper>

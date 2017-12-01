@@ -1,0 +1,110 @@
+/**
+ * 
+ */
+package info.zznet.znms.web.module.security.service.impl;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.ModelAndView;
+
+import info.zznet.znms.base.entity.dto.GraphHostDTO;
+import info.zznet.znms.base.rrd.bean.Graph;
+import info.zznet.znms.base.rrd.bean.SubItem;
+import info.zznet.znms.base.rrd.core.RrdFetcher;
+import info.zznet.znms.base.rrd.exception.RrdQueryException;
+import info.zznet.znms.web.module.common.service.impl.BaseServiceImpl;
+import info.zznet.znms.web.module.security.bean.CpuUsageBean;
+import info.zznet.znms.web.module.security.bean.DeviceStatusBean;
+import info.zznet.znms.web.module.security.service.HomePageService;
+import info.zznet.znms.web.module.system.service.GraphService;
+import info.zznet.znms.web.module.system.service.HostService;
+
+/**
+ * @author dell001
+ *
+ */
+@Transactional(propagation = Propagation.REQUIRED,rollbackFor=Exception.class)
+@Service("homePageService")
+public class HomePageServiceImpl extends BaseServiceImpl implements HomePageService{
+	
+	@Autowired
+	private HostService hostService;
+	
+	@Autowired
+	private GraphService graphService;
+	
+	@Override
+	public void findDeviceData(ModelAndView mv) {
+		//根据主机状态查询主机数
+		//查询正常主机
+		long normalNum = hostService.countHostByHostWorkStatus(1);
+		//查询宕机主机
+		long shutDownNum = hostService.countHostByHostWorkStatus(2);
+		//查询其他
+		long otherNum = hostService.countHostByHostWorkStatus(3);
+		long totalNum = normalNum + shutDownNum + otherNum;
+		Map<String, DeviceStatusBean> map = new LinkedHashMap<String, DeviceStatusBean>();
+		map.put("1", new DeviceStatusBean(normalNum, normalNum*100/totalNum));
+		map.put("2", new DeviceStatusBean(shutDownNum, shutDownNum*100/totalNum));
+		map.put("3", new DeviceStatusBean(otherNum, otherNum*100/totalNum));
+		mv.addObject("deviceMap", map);
+		mv.addObject("deviceTotal", totalNum);
+	}
+
+	@Override
+	public void findCpuUsageData(ModelAndView mv) {
+		Map<String, CpuUsageBean> map = new LinkedHashMap<String, CpuUsageBean>();
+		//查找所有使用cpu模板的图形
+		List<GraphHostDTO> list = graphService.findAllGraphHost();
+		List<Graph> graphList = new ArrayList<Graph>();
+		if(null!=list && list.size()>0){
+			for (GraphHostDTO graphHostDTO : list) {
+				try {
+					Graph graphData = RrdFetcher.fetchDataAndConvertToGraph(graphHostDTO.getGraphTemplateSimpleName(), 
+							graphHostDTO.getGraphUuid());
+					graphData.setHostName(graphHostDTO.getHostName());
+					graphList.add(graphData);
+				} catch (RrdQueryException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			Collections.sort(graphList, new Comparator<Graph>(){
+				public int compare(Graph o1, Graph o2) {
+					//按照cpu使用率进行降序排列
+					String data1 = o1.getData().get(o1.getData().size()-1).getData().get(o1.getData().get(o1.getData().size()-1).getData().size()-1);
+					String data2 = o2.getData().get(o2.getData().size()-1).getData().get(o2.getData().get(o2.getData().size()-1).getData().size()-1);
+					if(Double.valueOf(data1) > Double.valueOf(data2)){
+						return -1;
+					}
+					if(Double.valueOf(data1) > Double.valueOf(data2)){
+						return 0;
+					}
+					return 1;
+				}
+			}); 
+			
+			int count = graphList.size()>5 ?4:graphList.size()-1;
+			for(int i=0;i<=count;i++){
+				Graph graph = graphList.get(i);
+				List<SubItem> data = graph.getData();
+				List<String> dataList = data.get(data.size()-1).getData();
+				Double cpuUsagePercent = Double.valueOf(dataList.get(dataList.size()-1));
+				CpuUsageBean bean = new CpuUsageBean(cpuUsagePercent, graph.getHostName());
+				map.put(String.valueOf(i+1), bean);
+			}
+		}
+		mv.addObject("cpuMap", map);
+	}
+
+}

@@ -1,0 +1,407 @@
+function getOnlineUserData(){
+		$.ajax({
+			type:'post',
+			url:path+"/home/getOnlineUserData",
+			dataType:'json',
+			success:function(data){
+				//设置注册总人数
+				$("#totalRegistUser").html(data.registerUserCount+"人");
+				var totalUserCount = data.totalOnlineUserCount+"";
+				
+				var k=(totalUserCount.length-1)>4?4:(totalUserCount.length-1);
+				for(var i=0;i<5;i++){
+					if(i<totalUserCount.length){
+						$("#totalUserLi"+k).html(totalUserCount.charAt(i));
+						k--;
+					}else{
+						$("#totalUserLi"+i).html("0");
+					}
+					
+					
+				}
+				$("#pcUser").html(data.wireUserCount+"人");
+				$("#wirelessUser").html(data.wirelessUserCount+"人");
+				$("#otherUser").html(data.etcUserCount+"人");
+			}
+		});
+	}
+
+
+//查找在线用户折线图数据
+function getOnlineUserDataByCategory(){
+	$.ajax({
+		url:path+"/home/getOnlineUserDataByCategory",
+		type:"POST",
+		dataType:"json",
+		success:function(data){
+			var timeArray = [];
+			for(var i=1; i< data.timeList.length;i++){
+				 timeArray.push(data.timeList[i]);
+            }
+			var wireArray = [];
+			var wirelessArray = [];
+			var otherArray = [];
+			for(var i=0; i< data.userCountList[0].length;i++){
+				wireArray.push(data.userCountList[0][i]);
+           }
+			for(var i=0; i< data.userCountList[1].length;i++){
+				wirelessArray.push(data.userCountList[1][i]);
+           }
+			for(var i=0; i< data.userCountList[2].length;i++){
+				otherArray.push(data.userCountList[2][i]);
+           }
+			onlineUserChart.setOption({
+				 title: {
+				        text: ''
+				    },
+				    tooltip : {
+				        trigger: 'axis'
+				    },
+//				    legend: {
+//				        data:['电脑','移动','其他']
+//				    },
+				    grid: {
+				        left: '3%',
+				        right: '4%',
+				        bottom: '3%',
+				        containLabel: true
+				    },
+				    xAxis : [
+				        {
+				            type : 'category',
+				            boundaryGap : false,
+				            data : timeArray
+				        }
+				    ],
+				    yAxis : [
+				        {
+				            type : 'value'
+				        }
+				    ],
+				    series : [
+				        {
+				            name:'电脑',
+				            type:'line',
+				            stack: '在线人数',
+				            areaStyle: {normal: {}},
+				            smooth: true,
+				            data:wireArray
+				        },
+				        {
+				            name:'移动',
+				            type:'line',
+				            stack: '在线人数',
+				            areaStyle: {normal: {}},
+				            smooth: true,
+				            data:wirelessArray
+				        },
+				        {
+				            name:'其他',
+				            type:'line',
+				            stack: '在线人数',
+				            areaStyle: {normal: {}},
+				            smooth: true,
+				            data:otherArray
+				        }
+				        
+				    ],
+				    color:['#00adec','#8cd6f6','#ccebfa']
+			});
+		}
+	});
+}
+
+//获取设备统计数据
+function getDeviceData(){
+	$.ajax({
+		type:'post',
+		url:path+"/home/getDeviceData",
+		dataType:'json',
+		success:function(data){
+			for(var i=0;i<data.length;i++){
+				var countList = data[i];
+				var onlinePercent = "0%";
+				var downPercent = "0%";
+				if(countList[0]!=0){
+					onlinePercent = parseInt(countList[2])/parseInt(countList[0])*100+"%";
+					downPercent = parseInt(countList[1])/parseInt(countList[0])*100+"%";
+				}
+				if(i==0){
+					//设置交换设备
+					$("#exchangeDeviceTotal").html("<p>交换设备</p>"+countList[0]);
+					$("#exchangeDeviceOnline").html(countList[2]+"台");
+					$("#exchangeDeviceDown").html(countList[1]+"台");
+					$("#exchangeOnlinePercent").width(onlinePercent);
+					$("#exchangeDownPercent").width(downPercent);
+				}else if(i ==1){
+					//设置网关设备
+					$("#gatewayDeviceTotalCount").html("<p>网关设备</p>"+countList[0]);
+					$("#gatewayDeviceOnlineCount").html(countList[2]+"台");
+					$("#gatewayDeviceDownCount").html(countList[1]+"台");
+					$("#gatewayOnlinePercent").width(onlinePercent);
+					$("#gatewayDownPercent").width(downPercent);
+				}else if(i ==2){
+					//设置无线设备
+					$("#wirelessDeviceTotalCount").html("<p>无线设备</p>"+countList[0]);
+					$("#wirelesDeviceOnlineCount").html(countList[2]+"台");
+					$("#wirelesDeviceDownCount").html(countList[1]+"台");
+					$("#wirelessOnlinePercent").width(onlinePercent);
+					$("#wirelessDownPercent").width(downPercent);
+				}else if(i ==3){
+					//设置无线设备
+					$("#otherDeviceTotalCount").html("<p>其他设备</p>"+countList[0]);
+					$("#otherDeviceOnlineCount").html(countList[2]+"台");
+					$("#otherDeviceDownCount").html(countList[1]+"台");
+					$("#otherOnlinePercent").width(onlinePercent);
+					$("#otherDownPercent").width(downPercent);
+				}
+			}
+			
+		}
+	});
+}
+
+
+function getMainDeviceMonitorData(){
+	$.ajax({
+		type:'post',
+		url:path+"/home/getMainDeviceMonitorData",
+		dataType:'json',
+		success:function(data){
+			$("#mainDeviceMonitorDiv").html("");
+			for(var i=0;i<data.length;i++){
+				var host = data[i];
+				var row = "";
+				var status = "";
+				if(host.hostWorkStatus==1){
+					//正常
+					row +="<dl class='net_monitor_mod net_monitor_yes '>"
+					status = "正常";
+				}else{
+					row +="<dl class='net_monitor_mod net_monitor_no '>";
+					status = "宕机";
+				}
+				row += "<dt><i></i><div class='net_monitor_mod_bg'></div></dt><dd>名称："+host.hostName+"</dd>"+
+				"<dd>状态："+status+"</dd><dd>IP地址："+host.hostIp+"</dd>";
+				/*if(host.cpuUsePercent != ""){
+					row += "<dd>CPU："+host.cpuUsePercent+"%</dd>";
+				}else{
+					row += "<dd>CPU：</dd>"
+				}
+				if(host.memoryUsePercent != ""){
+					row += "<dd>内存："+host.memoryUsePercent+"%</dd>";
+				}else{
+					row += "<dd>内存：</dd>"
+				}*/
+				$("#mainDeviceMonitorDiv").append(row);
+			}
+			$("#marquee1").kxbdMarquee({direction:"left"});
+		}
+	});
+}
+
+
+function getNetHeathData(){
+	$.ajax({
+		type:'post',
+		url:path+"/home/getNetHeathData",
+		dataType:'json',
+		success:function(data){
+			for(var i=0;i<data.length;i++){
+				if(i==0){
+					$("#netHeathLi"+i).html(data[i]+"<p>紧急告警</p>");
+				}else if(i==1){
+					$("#netHeathLi"+i).html(data[i]+"<p>高级告警</p>");
+				}else if(i==2){
+					$("#netHeathLi"+i).html(data[i]+"<p>中级告警</p>");
+				}else if(i==3){
+					$("#netHeathLi"+i).html(data[i]+"<p>低级告警</p>");
+				}else if(i==4){
+					$("#netHeath").html(data[i]);
+				}
+				
+			}
+		}
+	});
+}
+
+
+function getExportFlowData(){
+	$.ajax({
+		type:'post',
+		url:path+"/home/getExportFlowData",
+		dataType:'json',
+		success:function(data){
+			$("#exportDiv").html("");
+			for(var i=0;i<data.length;i++){
+				var exportFlow = data[i];
+				var row = 
+						"<dl class='export_utilization'><dt id='exportName"+i+"'>"+exportFlow.name+"</dt>"+
+						"<dd class='scale_diagram_a'><div id='exportPlate"+i+"'>"+
+						"</div></dd><dd class='traffic_data'><ul><li><h2>下行流量</h2><p>";
+				if(exportFlow.downStream/(1024*1024*1024)>=1) {
+					row += parseInt(exportFlow.downStream/(1024*1024*1024)) + "Gbps";
+				} else if(exportFlow.downStream/(1024*1024)>=1) {
+					row += parseInt(exportFlow.downStream/(1024*1024)) + "Mbps";
+				} else if(exportFlow.downStream/(1024) >=1 ){
+					row += parseInt(exportFlow.downStream/(1024)) + "Kbps";
+				} else {
+					row += parseInt(exportFlow.downStream) + "bps";
+				}
+				row += "</p></li><li><h2>上行流量</h2><p>";
+				if(exportFlow.upStream/(1024*1024*1024)>=1) {
+					row += parseInt(exportFlow.upStream/(1024*1024*1024)) + "Gbps";
+				} else if(exportFlow.upStream/(1024*1024)>=1) {
+					row += parseInt(exportFlow.upStream/(1024*1024)) + "Mbps";
+				} else if(exportFlow.upStream/(1024) >=1 ){
+					row += parseInt(exportFlow.upStream/(1024)) + "Kbps";
+				} else {
+					row += parseInt(exportFlow.upStream) + "bps";
+				}
+				row += "</p></li></ul>"+
+						"</dd><dd class='scale_diagram_b'><div id='exportLine"+i+"'></div></dd></dl>";
+				$("#exportDiv").append(row);
+//				$("#exportPlate"+i).width(width);
+//				$("#exportPlate"+i).height(height);
+				$("#exportPlate"+i).width(310);
+				$("#exportPlate"+i).height(202);
+//				$("#exportLine"+i).width(width-50);
+//				$("#exportLine"+i).height(height-50);
+				$("#exportLine"+i).width(290);
+				$("#exportLine"+i).height(128);
+				var FlowData = 0;
+				var FlowDataReal = 0;
+				if(exportFlow.graph != null){
+					FlowData = exportFlow.graph.data[exportFlow.graph.data.length-1];
+					FlowDataReal = FlowData.data[FlowData.data.length-1];
+					if(FlowDataReal >100){
+						FlowDataReal = 100;
+					}
+				}
+				
+				//加载仪表图
+				echarts.init(document.getElementById('exportPlate'+i)).setOption({
+					 tooltip : {
+					        formatter: "{a} <br/>{b} : {c}%"
+					    },
+					    series: [
+					        {
+					        	radius:"100%",
+					            name: '',
+					            type: 'gauge',
+					            detail: {formatter:'{value}%'},
+					            axisLine:{
+					            	lineStyle:{
+					            		color:[[0.2, '#228822'], [0.8, '#4488bb'], [1, '#ff4400']],
+					            		width:10
+					            	}
+					            },
+					            axisTick:{
+					            	splitNumber: 10,
+					            	length:5
+					            },
+					            pointer:{
+					            	length:'100%'
+					            },
+					            splitLine: {           // 分隔线
+					                length:20,         // 属性length控制线长
+					                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+					                    color: 'auto'
+					                }
+					            },
+					            title:{
+					            	offsetCenter:[0,'-20%']
+					            },
+					            data: [{value: FlowDataReal, name: '出口利用率'}]
+					        }
+					    ]
+				});
+				
+				var timeArray = [];
+				var inflowArray = [];
+				var outflowArray = [];
+				if(exportFlow.graph!=null){
+					for(var j=0;j<exportFlow.graph.xAxis.length;j++){
+						timeArray.push(exportFlow.graph.xAxis[j]);
+					}
+					var xArray1 = exportFlow.graph.data[0].data;
+					for(var q=0;q<xArray1.length;q++){
+						outflowArray.push(xArray1[q]);
+					}
+					var xArray2 = exportFlow.graph.data[1].data;
+					for(var q=0;q<xArray2.length;q++){
+						inflowArray.push(xArray2[q]);
+					}
+				}
+//				加载流量折线图
+				echarts.init(document.getElementById('exportLine'+i)).setOption({
+					 title: {
+					        text: ''
+					    },
+					    tooltip : {
+					        trigger: 'axis'
+					    },
+					    grid: {
+					        left: '3%',
+					        right: '4%',
+					        bottom: '3%',
+					        top: '3%',
+					        containLabel: true
+					    },
+					    xAxis : [
+					        {
+					            type : 'category',
+					            boundaryGap : false,
+					            data : timeArray
+					        }
+					    ],
+					    yAxis : [
+					        {
+					            type : 'value',
+					            axisLabel : {
+									formatter : function (value, index) {
+										if(index==0){
+											return "";
+										}
+										if(value > 1024 * 1024 * 1024) {
+											return (value/(1024*1024*1024)).toFixed(1) + "Gb"
+										} else if(value > 1024 * 1024) {
+											return (value/(1024*1024)).toFixed(1) + "Mb";
+										} else if(value > 1024) {
+											return (value/1024).toFixed(1) + "Kb";
+										} else {
+											return value.toFixed(1) + "b"
+										}
+									}
+					            }
+					        }
+					    ],
+					    series : [
+					        {
+					        	symbolOffset:[0,'10%'],
+					            name:'流入',
+					            type:'line',
+					            stack: '流入',
+					            areaStyle: {normal: {}},
+					            data:inflowArray
+					        },
+					        {
+					        	symbolOffset:[0,'10%'],
+					            name:'流出',
+					            type:'line',
+					            stack: '流出',
+					            areaStyle: {normal: {}},
+					            data:outflowArray
+					        }
+					        
+					    ],
+					    color:['#00adec','#8cd6f6']
+			});
+		 }
+//			if(data.length>3){
+//				$("#marquee2").kxbdMarquee({direction:"left"});
+//			}
+	
+		}
+	});
+}

@@ -1,0 +1,237 @@
+package info.zznet.znms.softdog;
+
+import info.zznet.znms.base.common.ZNMSLogger;
+import info.zznet.znms.web.util.PathUtil;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.codec.binary.Base64;
+import org.hyperic.sigar.CpuInfo;
+import org.hyperic.sigar.NetFlags;
+import org.hyperic.sigar.NetInterfaceConfig;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarException;
+
+public class DogDecryptAuthData {
+
+	private static final int SPLITLENGTH = 4;
+	
+	public static void main(String[] args) {
+		new DogDecryptAuthData().run();
+	}
+	
+	public static Map<String,String> hardWareMap;
+	
+	public void run() {
+		String data;
+		try {
+			String znmsAuthFile =null;
+			if(System.getProperty("os.name").startsWith("Windows")){
+				znmsAuthFile = PathUtil.getPropertyPath()+File.separator+"znmsdog.dat";
+			}else{
+				znmsAuthFile="/home/hardware/znmsdog.dat";
+			}
+			data = readData(new FileInputStream(znmsAuthFile), "utf-8");
+			if (!decryptAuthData(data))
+				System.exit(0);
+		} catch (Exception e) {
+			ZNMSLogger.info("授权校验失败，退出系统.");
+			ZNMSLogger.error("授权校验失败，退出系统.");
+			System.exit(0);
+		}
+	}
+
+	/**
+	 * 解密硬件信息
+	 * 
+	 * @param authData
+	 * @return
+	 * @throws Exception
+	 */
+	public static boolean decryptAuthData(String authData) throws Exception {
+		boolean flag = true;
+		byte[] decodeBytes = Base64.decodeBase64(authData);
+		String decodeData = new String(DogRsaUtil.decryptByPrivateKey(decodeBytes,
+				DogRsaUtil.PRIVATE_KEY));
+		
+		String systemName=decodeData.substring(decodeData.indexOf("\n"),decodeData.indexOf("\n", decodeData.indexOf("\n")+1));
+		if(!systemName.split(":")[1].equalsIgnoreCase("z-nms")){
+			flag = false;
+			throw new Exception("请使用z-nms授权文件");
+		}
+		String ss=decodeData.substring(71, decodeData.indexOf("~endDate%")).trim();
+		String hardWareInfo = getHardwareInfo().trim();
+		
+		Map<String,String> map=new HashMap<String, String>();
+		String[] code = decodeData.substring(0, decodeData.indexOf("\n")).split(",");
+		for (int i = 0; i < code.length; i++) {
+			map.put(code[i], code[i]);
+		}
+		String[] strData=hardWareInfo.split(",");
+		for (int i = 0; i < strData.length; i++) {
+			String lostCode = getSplitString(new DogEncryptionMD5().getMD5(strData[i]));
+			if (!map.containsKey(lostCode)) {
+				flag = false;
+				return flag;
+			}
+		}
+		String str[] = decodeData.split("~");
+		String[] aa = str[1].split(",");
+		aa=aa[0].split("%");
+		for (int i = 1; i < aa.length; i++) {
+			switch (i) {
+			case 1:
+				if (compare_date(
+						new SimpleDateFormat("yyyy-MM-dd").format(new Date()),
+						DogThreeDes.getInstance().getDecString(
+								DogThreeDes.getInstance().getDecString(
+										aa[i]))) == 1) {
+					ZNMSLogger.info("授权过期，过期日期为:"
+							+ DogThreeDes.getInstance().getDecString(
+									DogThreeDes.getInstance().getDecString(
+											aa[i])));
+					flag = false;
+				}
+				break;
+			case 2:
+				hardWareMap.put("maxOnlineNum",aa[i].split(":")[1] );//是否开启运营商.值务必为true/false
+				break;
+			case 3:
+				hardWareMap.put("operatorAuth",aa[i].split(":")[1]);//是否开启运营商.值务必为true/false
+				break;
+			default:
+				hardWareMap.put(aa[i].split(":")[0],aa[i].split(":")[1]);
+				break;
+			}
+		}
+		return flag;
+	}
+
+	public static String getHardwareInfo() throws Exception {
+		if(hardWareMap==null){
+			hardWareMap=new HashMap<String, String>();
+			hardWareMap.put("operatorAuth","false");//是否开启运营商.值务必为true/false
+			Map<String,String> cpuMap=new HashMap<String, String>();
+	    	Map<String,String> netWorkMap=new HashMap<String, String>();
+			StringBuffer sbf = new StringBuffer();
+			try {
+				Sigar sigar = new Sigar();
+				CpuInfo[] cpuInfo = sigar.getCpuInfoList();
+				for (int i = 0; i < cpuInfo.length; i++) {
+					cpuMap.put(cpuInfo[i].getModel(), cpuInfo[i].getModel());
+				}
+				String[] ifaces = sigar.getNetInterfaceList();
+				for (int i = 0; i < ifaces.length; i++) {
+					NetInterfaceConfig cfg = sigar.getNetInterfaceConfig(ifaces[i]);
+					if (NetFlags.LOOPBACK_ADDRESS.equals(cfg.getAddress())
+							|| (cfg.getFlags() & NetFlags.IFF_LOOPBACK) != 0
+							|| NetFlags.NULL_HWADDR.equals(cfg.getHwaddr())||(cfg.getFlags() !=2115)) {
+						continue;
+					}
+					netWorkMap.put(cfg.getHwaddr(), cfg.getHwaddr());
+				}
+				
+				Iterator<Entry<String, String>> iterator=cpuMap.entrySet().iterator();
+				 while(iterator.hasNext()){
+					 Entry<String, String> map=iterator.next();
+					 sbf.append(map.getKey());
+					 sbf.append(",");
+				 }
+				Iterator<Entry<String, String>> netWorkIterator=netWorkMap.entrySet().iterator();
+				 while(netWorkIterator.hasNext()){
+					 Entry<String, String> map=netWorkIterator.next();
+					 sbf.append(map.getKey());
+					 sbf.append(",");
+				 }
+			} catch (SigarException e) {
+				ZNMSLogger.error("授权文件格式不正确");
+			}
+			hardWareMap.put("hardware", sbf.toString());
+		}
+		return hardWareMap.get("hardware");
+	}
+
+	/**
+	 * 日期计算
+	 * 
+	 * @param DATE1
+	 * @param DATE2
+	 * @return
+	 */
+	public static int compare_date(String DATE1, String DATE2) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			Date dt1 = df.parse(DATE1);
+			Date dt2 = df.parse(DATE2);
+			if (dt1.getTime() > dt2.getTime()) {
+				return 1;
+			} else if (dt1.getTime() < dt2.getTime()) {
+				return -1;
+			} else if (dt1.getTime() == dt2.getTime()) {
+				return 0;
+			} else {
+				return 0;
+			}
+		} catch (Exception exception) {
+			ZNMSLogger.info("授权文件格式不正确");
+		}
+		return 0;
+	}
+
+	/**
+	 * 读取数据
+	 * @param inSream
+	 * @param charsetName
+	 * @return
+	 * @throws Exception
+	 */
+	public static String readData(InputStream inSream, String charsetName)
+			throws Exception {
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int len = -1;
+		while ((len = inSream.read(buffer)) != -1) {
+			outStream.write(buffer, 0, len);
+		}
+		byte[] data = outStream.toByteArray();
+		outStream.close();
+		inSream.close();
+		return new String(data, charsetName);
+	}
+
+	public static String getSplitString(String str) {
+		return getSplitString(str, "-", SPLITLENGTH);
+	}
+
+	public static String getSplitString(String str, String split, int length) {
+		int len = str.length();
+		StringBuilder temp = new StringBuilder();
+		for (int i = 0; i < len; i++) {
+			if (i % length == 0 && i > 0) {
+				temp.append(split);
+			}
+			temp.append(str.charAt(i));
+		}
+		String[] attrs = temp.toString().split(split);
+		StringBuilder finalMachineCode = new StringBuilder();
+		for (String attr : attrs) {
+			if (attr.length() == length) {
+				finalMachineCode.append(attr).append(split);
+			}
+		}
+		String result = finalMachineCode.toString().substring(0,
+				finalMachineCode.toString().length() - 1);
+		return result;
+	}
+}
+

@@ -1,0 +1,65 @@
+/**
+ * 
+ */
+package info.zznet.znms.web.module.apInformation.service.impl;
+
+import java.util.List;
+
+import info.zznet.znms.base.dao.ApInformationMapper;
+import info.zznet.znms.base.entity.ApInformation;
+import info.zznet.znms.web.module.apInformation.service.ApInformationService;
+import info.zznet.znms.web.module.common.service.impl.BaseServiceImpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @author dell001
+ *
+ */
+@Transactional(propagation = Propagation.REQUIRED,rollbackFor=Exception.class)
+@Service("apInformationService")
+public class ApInformationServiceImpl extends BaseServiceImpl implements ApInformationService{
+
+	@Autowired
+	private ApInformationMapper apInformationMapper;
+
+	@Override
+	public List<ApInformation> findApByCondition(String acIp, String apName, int apPositionStatus) {
+		return apInformationMapper.findApByCondition(acIp, apName, apPositionStatus);
+	}
+
+	@Override
+	public void update(String apInformationUuid, String apAxis) {
+		apInformationMapper.updateApAxis(apInformationUuid, apAxis);
+	}
+
+	@Override
+	public ApInformation selectByPrimaryKey(String apInformationUuid) {
+		return apInformationMapper.selectByPrimaryKey(apInformationUuid);
+	}
+
+	@Override
+	public ApInformation findApByApMac(String apMac) {
+		
+		return apInformationMapper.findApByApMac(apMac);
+	}
+
+	@Override
+	public void updateByPrimaryKeySelective(ApInformation record) {
+		apInformationMapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public List<ApInformation> findAll() {
+		return apInformationMapper.findAll();
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String apInformationUuid) {
+		return apInformationMapper.deleteByPrimaryKey(apInformationUuid);
+	}
+
+}

@@ -1,0 +1,25 @@
+/**
+ * 
+ */
+package info.zznet.znms.web.module.system.service;
+
+import info.zznet.znms.web.module.common.service.BaseService;
+import info.zznet.znms.web.module.system.bean.SystemOptionBean;
+
+/**
+ * @author dell001
+ *
+ */
+public interface SystemOptionService extends BaseService{
+
+	/**
+	 * @return
+	 */
+	SystemOptionBean getSystemOptionData();
+
+	/**
+	 * @param bean
+	 */
+	void updateSystemOption(SystemOptionBean bean);
+
+}

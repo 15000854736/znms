@@ -1,0 +1,45 @@
+/**
+ * 
+ */
+package info.zznet.znms.base.job;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import info.zznet.znms.base.common.ZNMSLogger;
+import info.zznet.znms.web.WebRuntimeData;
+import info.zznet.znms.web.util.ApiClientUtil;
+
+import org.quartz.DisallowConcurrentExecution;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+/**
+ * @author dell001
+ *
+ */
+@Service
+@DisallowConcurrentExecution
+public class GetDataFromZlogJob {
+	private WebRuntimeData webRuntimeData = WebRuntimeData.instance;
+	
+	/**
+	 * 每隔一分钟从zlog获取数据存到内存中
+	 */
+	@Scheduled(fixedDelay = 60*1000)
+	public void getScreenDataFromZlog(){
+		try{
+			String zlogIp=webRuntimeData.getSystemOptionBean().getZlogIp();
+			String zlogPort=webRuntimeData.getSystemOptionBean().getZlogPort();
+			Map<String,String> paramMap=new HashMap<String, String>();
+			paramMap.put("from", String.valueOf(System.currentTimeMillis()-24*60*601000));
+			paramMap.put("to", String.valueOf(System.currentTimeMillis()));
+			ApiClientUtil apiClientUtil=new ApiClientUtil("http://"+zlogIp+":"+zlogPort+"/z-log/api/rest/getOnlineAnalyzeResult");
+			String data = apiClientUtil.post(paramMap);
+			webRuntimeData.setScreenData(data);
+		} catch(Throwable e) {
+			e.printStackTrace();
+			ZNMSLogger.error(e);
+		}
+	}
+}

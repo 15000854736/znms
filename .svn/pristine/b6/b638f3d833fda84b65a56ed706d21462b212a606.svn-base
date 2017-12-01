@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.GraphTemplateMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.GraphTemplate" >
+   	<id column="GRAPH_TEMPLATE_ID" property="graphTemplateId" jdbcType="VARCHAR" />
+    <result column="OID" property="oid" jdbcType="VARCHAR" />
+    <result column="GRAPH_TEMPLATE_NAME" property="graphTemplateName" jdbcType="VARCHAR" />
+    <result column="GRAPH_TEMPLATE_SIMPLE_NAME" property="graphTemplateSimpleName" jdbcType="VARCHAR" />
+    <result column="DS_NAME" property="dsName" jdbcType="VARCHAR" />
+    <result column="DS_SHOW_NAME" property="dsShowName" jdbcType="VARCHAR" />
+    <result column="DS_TYPE" property="dsType" jdbcType="INTEGER" />
+    <result column="CONSOL_FUN" property="consolFun" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    GRAPH_TEMPLATE_ID, OID, GRAPH_TEMPLATE_NAME, GRAPH_TEMPLATE_SIMPLE_NAME, DS_NAME, DS_SHOW_NAME, DS_TYPE, CONSOL_FUN
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from GRAPH_TEMPLATE
+    where GRAPH_TEMPLATE_ID = #{graphTemplateId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findAll" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from GRAPH_TEMPLATE
+  </select>
+  
+  <select id="findApplicableGraphTemplateByHost" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from GRAPH_TEMPLATE
+    where GRAPH_TEMPLATE_ID not in (select GRAPH_TEMPLATE_ID from GRAPH where HOST_UUID = #{hostUuid,jdbcType=VARCHAR})
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from GRAPH_TEMPLATE
+    where GRAPH_TEMPLATE_ID = #{graphTemplateId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.GraphTemplate" >
+    insert into GRAPH_TEMPLATE (GRAPH_TEMPLATE_ID, OID, GRAPH_TEMPLATE_NAME, GRAPH_TEMPLATE_SIMPLE_NAME, DS_NAME, DS_SHOW_NAME, DS_TYPE, CONSOL_FUN)
+    values (#{graphTemplateId,jdbcType=VARCHAR}, #{oid,jdbcType=VARCHAR}, 
+    #{graphTemplateName,jdbcType=VARCHAR}, #{graphTemplateSimpleName,jdbcType=VARCHAR},
+    #{dsName},#{dsShowName},#{dsType},#{consolFun})
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.GraphTemplate" >
+    insert into GRAPH_TEMPLATE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+     <if test="graphTemplateId != null" >
+        GRAPH_TEMPLATE_ID,
+      </if>
+      <if test="oid != null" >
+        OID,
+      </if>
+      <if test="graphTemplateName != null" >
+        GRAPH_TEMPLATE_NAME,
+      </if>
+      <if test="graphTemplateSimpleName != null" >
+        GRAPH_TEMPLATE_SIMPLE_NAME,
+      </if>
+      <if test="dsName != null" >
+        DS_NAME,
+      </if>
+      <if test="dsShowName != null" >
+        DS_SHOW_NAME,
+      </if>
+      <if test="dsType != null" >
+        DS_TYPE,
+      </if>
+      <if test="consolFun != null" >
+        CONSOL_FUN,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+   	 <if test="graphTemplateId != null" >
+        #{graphTemplateId,jdbcType=VARCHAR},
+      </if>
+      <if test="oid != null" >
+        #{oid,jdbcType=VARCHAR},
+      </if>
+      <if test="graphTemplateName != null" >
+        #{graphTemplateName,jdbcType=VARCHAR},
+      </if>
+      <if test="graphTemplateSimpleName != null" >
+        #{graphTemplateSimpleName,jdbcType=VARCHAR},
+      </if>
+       <if test="dsName != null" >
+        #{dsName},
+      </if>
+      <if test="dsShowName != null" >
+        #{dsShowName},
+      </if>
+      <if test="dsType != null" >
+        #{dsType},
+      </if>
+      <if test="consolFun != null" >
+        #{consolFun},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.GraphTemplate" >
+    update GRAPH_TEMPLATE
+    <set >
+      <if test="graphTemplateName != null" >
+        GRAPH_TEMPLATE_NAME = #{graphTemplateName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where GRAPH_TEMPLATE_ID = #{graphTemplateId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.GraphTemplate" >
+    update GRAPH_TEMPLATE
+    set GRAPH_TEMPLATE_NAME = #{graphTemplateName,jdbcType=VARCHAR}
+    where GRAPH_TEMPLATE_ID = #{graphTemplateId,jdbcType=VARCHAR}
+  </update>
+</mapper>

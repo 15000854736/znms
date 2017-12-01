@@ -1,0 +1,35 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: shenqilei
+  Date: 2016/12/9
+  Time: 15:41
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%
+    String path=request.getContextPath();
+%>
+<style>
+</style>
+<script>
+
+    function showFullScreen_studentAccessType(){
+        console.log("invoke studentAccessType");
+    }
+
+</script>
+<div class="s_student_accessbox">
+    <h1>学生用户接入方式统计</h1>
+    <div class="s_student_access_center">
+        <div class="s_student_data"><img src="<%=path%>/images/screen/module/studentAccessType/8.png" ></div>
+        <ul class="s_student_ulicon">
+            <li class="s_student_a"><p class="font_2vw blod led_fonts">12323</p><p>无线Portal</p></li>
+            <li class="s_student_b"><p class="font_2vw blod led_fonts">12323</p><p>有线802.1x</p></li>
+            <li class="s_student_c"><p class="font_2vw blod led_fonts">12323</p><p>有线Portal</p></li>
+            <li class="s_student_d"><p class="font_2vw blod led_fonts">12323</p><p>无线802.1x</p></li>
+        </ul>
+    </div>
+    <div class="s_student_databg"><img src="<%=path%>/images/screen/module/studentAccessType/9.png" ></div>
+</div>

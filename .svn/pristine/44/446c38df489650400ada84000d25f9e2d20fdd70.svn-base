@@ -1,0 +1,62 @@
+package info.zznet.znms.base.job;
+
+import info.zznet.znms.base.entity.ApInformation;
+import info.zznet.znms.base.entity.Host;
+import info.zznet.znms.spider.bean.ApProperties;
+import info.zznet.znms.spider.bean.ScanHost;
+import info.zznet.znms.spider.util.SnmpUtil;
+import info.zznet.znms.web.module.apInformation.service.ApInformationService;
+import info.zznet.znms.web.module.system.service.HostService;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.quartz.DisallowConcurrentExecution;
+import org.snmp4j.mp.SnmpConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+
+@Service
+@DisallowConcurrentExecution
+public class ApInfomationJob {
+	
+	
+	@Autowired
+	private HostService hostService;
+	
+	@Autowired
+	private ApInformationService apInformationService;
+	
+	
+	@Scheduled(initialDelay =1*1000,fixedDelay = 3*1000)
+	public void updateApInfomation(){
+		  List<Host> hostList = hostService.findAllAc();
+	      for (Host host : hostList) {
+	    	  ScanHost scanHost=new ScanHost();
+	    	  scanHost.setCommunity(host.getSnmpCommunity());
+	    	  scanHost.setSnmpUserName(host.getSnmpUserName());
+	    	  scanHost.setSnmpAuthProtocol(host.getSnmpAuthProtocol());
+	    	  scanHost.setSnmpPrivPassphrase(host.getSnmpPrivPassphrase());
+	    	  scanHost.setSnmpVersion(host.getSnmpVersion()+"");
+	    	  scanHost.setIp(host.getHostIp());
+	    	  scanHost.setSnmpPort(host.getSnmpPort()+"");
+	    	  scanHost.setSnmpPassword(host.getSnmpPassword());
+	    	  scanHost.setSnmpUserName(host.getSnmpUserName());
+	    	  List<ApProperties> apResult=SnmpUtil.getApInfo(SnmpConstants.version2c, scanHost);
+	    	  for (ApProperties apProperties : apResult) {
+	    		  ApInformation apInformation = apInformationService.findApByApMac(apProperties.getApMac().trim());
+	    		  if(apInformation!=null){
+	    			  apInformation.setApUserCount(Integer.parseInt(apProperties.getOnLineNum().trim()));
+	    			  apInformation.setApUserMax(Integer.parseInt(apProperties.getOnLineMaxNum().trim()));
+	    			  apInformation.setLastUpdateTime(new java.util.Date());
+	    			  apInformationService.updateByPrimaryKeySelective(apInformation);
+	    		  }
+			}
+	      }
+	}
+	
+	
+}

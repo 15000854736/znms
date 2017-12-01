@@ -1,0 +1,4 @@
+.errMsg { display:none;color:red;}
+.yes_box{ display:none; width:400px; background:#e9fbfe; border:1px solid #0e75bc; border-radius:5px; position:fixed; z-index:99999;  color:#0e75bc; font-size:12px; text-align:center; line-height:45px; padding:30px  0;left:50%;top:50%;margin:-5% 0 0 -200px;   box-shadow: 0 0 5px rgb(14,117,188);}
+.close a{ display:block; width:15px; height:15px; position:absolute; right:5px; top:5px; background:url(../../images/adminIf/close.png) no-repeat;}
+.close a span{ display:none; }

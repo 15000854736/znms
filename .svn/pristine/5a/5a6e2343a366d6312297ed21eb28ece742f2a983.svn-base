@@ -1,0 +1,684 @@
+/**
+ * 
+ */
+package info.zznet.znms.web.module.system.bean;
+
+import info.zznet.znms.base.common.ZNMSLogger;
+import info.zznet.znms.base.entity.SystemOption;
+import info.zznet.znms.base.util.StringUtil;
+import info.zznet.znms.web.module.common.constants.SystemOptionEnums;
+import info.zznet.znms.web.util.ConfigUtil;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
+import org.apache.commons.lang.StringUtils;
+
+/**
+ * @author dell001
+ *系统选项查询bean 
+ */
+public class SystemOptionBean implements Serializable{
+	
+	private static final long serialVersionUID = 3052054323627832866L;
+	
+	/**********************邮件strat************************/
+	//smtp服务器主机名
+	private String smtpServerHostName;
+	
+	//smtp端口
+	private int smtpPort;
+	
+	//smtp用户名
+	private String smtpUserName;
+	
+	//smtp密码
+	private String smtpPassword;
+	
+	//smtp密码确认
+	private String smtpPasswordConfirm;
+	/**********************邮件end************************/
+	
+	
+	/**********************报警/阀值start************************/
+	//禁用所有阀值  0.否  1.是
+	private boolean disableAllThresholdValue;
+	
+	//保留天数
+	private int remainDays;
+	
+	//主机宕机通知邮件
+	private String hostShutDownNotifyEmail;
+	
+	//使用主机主题
+	private String useHostTheme;
+	
+	//主机宕机消息
+	private String hostShutDownMessage;
+	
+	//恢复主机主题
+	private String recoverHostTheme;
+	
+	//恢复主机信息
+	private String recoverHostMessage;
+	
+	//报警文本信息
+	private String alarmText;
+	
+	//阀值警告
+	private String thresholdValueAlarm;
+	/**********************报警/阀值end************************/
+	
+	
+	/**********************系统日志start************************/
+	//启用状态
+	private boolean useStatus;
+	
+	//按域名清除
+	private String clearByDomainName;
+	
+	//刷新周期
+	private String flushCycle;
+	
+	//日志保留时间 
+	private String logRemainTime;
+	
+	// 日志保留条数
+	private long logRemainNumber;
+	/**********************系统日志end************************/
+	
+	
+	/**
+	 *==========杂项start==========
+	 */
+	//TFTP服务器
+	private String tftpServer;
+	
+	//备份路径
+	private String backupPath;
+	
+	//邮箱地址
+	private String emailAddress;
+	
+	//备份天数
+	private int backupDays;
+	
+	// zos ip
+	private String zosIp;
+	// zos port
+	private String zosPort;
+	
+	private String zlogIp;
+	private String zlogPort;
+
+	/**
+	 *==========杂项end==========
+	 */
+	
+	/**
+	 * 图片
+	 */
+	private String schoolBg="SCHOOL-BG.png";
+	private String homeBg="HOME-BG.jpg";
+	private String topolBg="topo-bg.jpg";
+	private String indexBg="INDEX-LOGO.png";
+	
+	private String schoolBgSize;
+	private String homeBgSize;
+	private String topolBgSize;
+	private String indexBgSize;
+	
+	private String schoolBgModifyDate;
+	private String homeBgModifyDate;
+	private String topolBgModifyDate;
+	private String indexBgModifyDate;
+	
+	
+	
+	public String getSchoolBgSize() {
+		return schoolBgSize;
+	}
+
+	public void setSchoolBgSize(String schoolBgSize) {
+		this.schoolBgSize = schoolBgSize;
+	}
+
+	public String getHomeBgSize() {
+		return homeBgSize;
+	}
+
+	public void setHomeBgSize(String homeBgSize) {
+		this.homeBgSize = homeBgSize;
+	}
+
+	public String getTopolBgSize() {
+		return topolBgSize;
+	}
+
+	public void setTopolBgSize(String topolBgSize) {
+		this.topolBgSize = topolBgSize;
+	}
+
+	public String getIndexBgSize() {
+		return indexBgSize;
+	}
+
+	public void setIndexBgSize(String indexBgSize) {
+		this.indexBgSize = indexBgSize;
+	}
+	
+	public String getSchoolBgModifyDate() {
+		return schoolBgModifyDate;
+	}
+
+	public void setSchoolBgModifyDate(String schoolBgModifyDate) {
+		this.schoolBgModifyDate = schoolBgModifyDate;
+	}
+
+	public String getHomeBgModifyDate() {
+		return homeBgModifyDate;
+	}
+
+	public void setHomeBgModifyDate(String homeBgModifyDate) {
+		this.homeBgModifyDate = homeBgModifyDate;
+	}
+
+	public String getTopolBgModifyDate() {
+		return topolBgModifyDate;
+	}
+
+	public void setTopolBgModifyDate(String topolBgModifyDate) {
+		this.topolBgModifyDate = topolBgModifyDate;
+	}
+
+	public String getIndexBgModifyDate() {
+		return indexBgModifyDate;
+	}
+
+	public void setIndexBgModifyDate(String indexBgModifyDate) {
+		this.indexBgModifyDate = indexBgModifyDate;
+	}
+
+	public SystemOptionBean(){};
+	
+	public SystemOptionBean(List<SystemOption> systemOptionList){
+		loadSystemOptionData(systemOptionList);
+	};
+	
+	public String selectBySystemOperatorKey(String systemOperatorKey,List<SystemOption> systemOptionList){
+		try {
+			for (SystemOption systemOption : systemOptionList) {
+				if(systemOption.getSystemOptionKey().equalsIgnoreCase(systemOperatorKey)){
+					return systemOption.getSystemOptionValue();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+	
+	public void loadSystemOptionData(List<SystemOption> systemOptionList){
+		String key;
+		for(SystemOption systemOption : systemOptionList){
+			key = systemOption.getSystemOptionKey();
+			
+			if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.SMTP_SERVER_HOST_NAME.getName())){
+				smtpServerHostName = systemOption.getSystemOptionValue();
+			} 
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.SMTP_PORT.getName())){
+				smtpPort = StringUtil.strToInteger(systemOption.getSystemOptionValue());
+			} 
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.SMTP_USER_NAME.getName())){
+				smtpUserName = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.SMTP_PASSWORD.getName())){
+				smtpPassword = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.SMTP_PASSWORD_CONFIRM.getName())){
+				smtpPasswordConfirm = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.DISABLE_ALL_THRESHOLD_VALUE.getName())){
+				if("1".equals(systemOption.getSystemOptionValue())){
+					disableAllThresholdValue = true;
+				}else{
+					disableAllThresholdValue = false;
+				}
+			}else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.REMAIN_DAYS.getName())){
+				remainDays = StringUtil.strToInteger(systemOption.getSystemOptionValue());
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.HOST_SHUT_DOWN_NOTIFY_EMAIL.getName())){
+				hostShutDownNotifyEmail = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.USE_HOST_THEME.getName())){
+				useHostTheme = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.HOST_SHUT_DOWN_MESSAGE.getName())){
+				hostShutDownMessage = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.RECOVER_HOST_THEME.getName())){
+				recoverHostTheme = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.RECOVER_HOST_MESSAGE.getName())){
+				recoverHostMessage = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.ALARM_TEXT.getName())){
+				alarmText = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.THRESHOLD_VALUE_ALARM.getName())){
+				thresholdValueAlarm = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.USE_STATUS.getName())){
+				if("1".equals(systemOption.getSystemOptionValue())){
+					useStatus = true;
+				}else{
+					useStatus = false;
+				}
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.CLEAR_BY_DOMAIN_NAME.getName())){
+				clearByDomainName = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.FLUSH_CYCLE.getName())){
+				flushCycle = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.LOG_REMAIN_TIME.getName())){
+				logRemainTime = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.LOG_REMAIN_NUMBER.getName())){
+				logRemainNumber = StringUtils.isNumeric(systemOption.getSystemOptionValue())?10000000l:Long.parseLong(systemOption.getSystemOptionValue());
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.TFTP_SERVER.getName())){
+				tftpServer = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.BACKUP_PATH.getName())){
+				backupPath = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.EMAIL_ADDRESS.getName())){
+				emailAddress = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.BACKUP_DAYS.getName())){
+				backupDays = StringUtil.strToInteger(systemOption.getSystemOptionValue());
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.ZOS_IP.getName())){
+				zosIp = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.ZOS_PORT.getName())){
+				zosPort = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.ZLOG_IP.getName())){
+				zlogIp = systemOption.getSystemOptionValue();
+			}
+			else if(key.equals(SystemOptionEnums.SYSTEM_OPTION_KEY.ZLOG_PORT.getName())){
+				zlogPort = systemOption.getSystemOptionValue();
+			}
+		}
+		getHeatData();
+	}
+	
+	private void getHeatData(){
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		BufferedImage bufferedImage = null;
+		try {
+			String path[]={ConfigUtil.getString("znms.image.path")+schoolBg,
+					ConfigUtil.getString("znms.image.path")+homeBg,
+					ConfigUtil.getString("znms.image.path")+indexBg};
+			for (int i = 0; i < path.length; i++) {
+				File imageFile = new File(path[i]);
+				if(!imageFile.exists() || !imageFile.isFile()) {
+					return ;
+				}
+				Date date= new Date(imageFile.lastModified());
+				bufferedImage = ImageIO.read(imageFile);
+				int width = bufferedImage.getWidth();   
+				int height = bufferedImage.getHeight();
+				switch (i) {
+				case 0:
+					schoolBgModifyDate=sdf.format(date);
+					schoolBgSize=width+" * "+height;
+					break;
+				case 1:
+					homeBgModifyDate=sdf.format(date);
+					homeBgSize=width+" * "+height;
+					break;
+				case 2:
+					indexBgModifyDate=sdf.format(date);
+					indexBgSize=width+" * "+height;
+					break;
+				case 3:
+					topolBgModifyDate=sdf.format(date);
+					topolBgSize=width+" * "+height;
+					break;
+				default:
+					break;
+				}
+			}
+		} catch (IOException e) {
+			ZNMSLogger.error(e);
+		}   
+	}
+	
+	/**
+	 * 生成用于插入DB的键值对
+	 * @return 系统配置键值对
+	 */
+	public HashMap<String, String> generateSystemOptionMap(){
+		HashMap<String, String> systemOptionMap = new HashMap<String, String>();
+		
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.SMTP_SERVER_HOST_NAME.getName(), StringUtil.getString(smtpServerHostName));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.SMTP_PORT.getName(), StringUtil.getString(smtpPort));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.SMTP_USER_NAME.getName(), StringUtil.getString(smtpUserName));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.SMTP_PASSWORD.getName(), StringUtil.getString(smtpPassword));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.SMTP_PASSWORD_CONFIRM.getName(), StringUtil.getString(smtpPasswordConfirm));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.DISABLE_ALL_THRESHOLD_VALUE.getName(), StringUtil.getString(disableAllThresholdValue));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.REMAIN_DAYS.getName(), StringUtil.getString(remainDays));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.HOST_SHUT_DOWN_NOTIFY_EMAIL.getName(), StringUtil.getString(hostShutDownNotifyEmail));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.USE_HOST_THEME.getName(), StringUtil.getString(useHostTheme));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.HOST_SHUT_DOWN_MESSAGE.getName(), StringUtil.getString(hostShutDownMessage));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.RECOVER_HOST_THEME.getName(), StringUtil.getString(recoverHostTheme));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.RECOVER_HOST_MESSAGE.getName(), StringUtil.getString(recoverHostMessage));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.ALARM_TEXT.getName(), StringUtil.getString(alarmText));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.THRESHOLD_VALUE_ALARM.getName(), StringUtil.getString(thresholdValueAlarm));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.USE_STATUS.getName(), StringUtil.getString(useStatus));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.CLEAR_BY_DOMAIN_NAME.getName(), StringUtil.getString(clearByDomainName));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.FLUSH_CYCLE.getName(), StringUtil.getString(flushCycle));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.LOG_REMAIN_TIME.getName(), StringUtil.getString(logRemainTime));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.LOG_REMAIN_NUMBER.getName(), StringUtil.getString(logRemainNumber));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.TFTP_SERVER.getName(), StringUtil.getString(tftpServer));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.BACKUP_PATH.getName(), StringUtil.getString(backupPath));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.EMAIL_ADDRESS.getName(), StringUtil.getString(emailAddress));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.BACKUP_DAYS.getName(), StringUtil.getString(backupDays));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.ZOS_IP.getName(), StringUtil.getString(zosIp));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.ZOS_PORT.getName(), StringUtil.getString(zosPort));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.ZLOG_IP.getName(), StringUtil.getString(zlogIp));
+		systemOptionMap.put(
+				SystemOptionEnums.SYSTEM_OPTION_KEY.ZLOG_PORT.getName(), StringUtil.getString(zlogPort));
+		return systemOptionMap;
+	}
+
+	public String getSmtpServerHostName() {
+		return smtpServerHostName;
+	}
+
+	public void setSmtpServerHostName(String smtpServerHostName) {
+		this.smtpServerHostName = smtpServerHostName;
+	}
+
+	public int getSmtpPort() {
+		return smtpPort;
+	}
+
+	public void setSmtpPort(int smtpPort) {
+		this.smtpPort = smtpPort;
+	}
+
+	public String getSmtpUserName() {
+		return smtpUserName;
+	}
+
+	public void setSmtpUserName(String smtpUserName) {
+		this.smtpUserName = smtpUserName;
+	}
+
+	public String getSmtpPassword() {
+		return smtpPassword;
+	}
+
+	public void setSmtpPassword(String smtpPassword) {
+		this.smtpPassword = smtpPassword;
+	}
+
+	public String getSmtpPasswordConfirm() {
+		return smtpPasswordConfirm;
+	}
+
+	public void setSmtpPasswordConfirm(String smtpPasswordConfirm) {
+		this.smtpPasswordConfirm = smtpPasswordConfirm;
+	}
+
+	public boolean isDisableAllThresholdValue() {
+		return disableAllThresholdValue;
+	}
+
+	public void setDisableAllThresholdValue(boolean disableAllThresholdValue) {
+		this.disableAllThresholdValue = disableAllThresholdValue;
+	}
+
+	public int getRemainDays() {
+		return remainDays;
+	}
+
+	public void setRemainDays(int remainDays) {
+		this.remainDays = remainDays;
+	}
+
+	public String getHostShutDownNotifyEmail() {
+		return hostShutDownNotifyEmail;
+	}
+
+	public void setHostShutDownNotifyEmail(String hostShutDownNotifyEmail) {
+		this.hostShutDownNotifyEmail = hostShutDownNotifyEmail;
+	}
+
+	public String getUseHostTheme() {
+		return useHostTheme;
+	}
+
+	public void setUseHostTheme(String useHostTheme) {
+		this.useHostTheme = useHostTheme;
+	}
+
+	public String getHostShutDownMessage() {
+		return hostShutDownMessage;
+	}
+
+	public void setHostShutDownMessage(String hostShutDownMessage) {
+		this.hostShutDownMessage = hostShutDownMessage;
+	}
+
+	public String getRecoverHostTheme() {
+		return recoverHostTheme;
+	}
+
+	public void setRecoverHostTheme(String recoverHostTheme) {
+		this.recoverHostTheme = recoverHostTheme;
+	}
+
+	public String getRecoverHostMessage() {
+		return recoverHostMessage;
+	}
+
+	public void setRecoverHostMessage(String recoverHostMessage) {
+		this.recoverHostMessage = recoverHostMessage;
+	}
+
+	public String getAlarmText() {
+		return alarmText;
+	}
+
+	public void setAlarmText(String alarmText) {
+		this.alarmText = alarmText;
+	}
+
+	public String getThresholdValueAlarm() {
+		return thresholdValueAlarm;
+	}
+
+	public void setThresholdValueAlarm(String thresholdValueAlarm) {
+		this.thresholdValueAlarm = thresholdValueAlarm;
+	}
+
+	public boolean isUseStatus() {
+		return useStatus;
+	}
+
+	public void setUseStatus(boolean useStatus) {
+		this.useStatus = useStatus;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public String getClearByDomainName() {
+		return clearByDomainName;
+	}
+
+	public void setClearByDomainName(String clearByDomainName) {
+		this.clearByDomainName = clearByDomainName;
+	}
+
+	public String getFlushCycle() {
+		return flushCycle;
+	}
+
+	public void setFlushCycle(String flushCycle) {
+		this.flushCycle = flushCycle;
+	}
+
+	public String getLogRemainTime() {
+		return logRemainTime;
+	}
+
+	public void setLogRemainTime(String logRemainTime) {
+		this.logRemainTime = logRemainTime;
+	}
+
+	public long getLogRemainNumber() {
+		return logRemainNumber;
+	}
+
+	public void setLogRemainNumber(long logRemainNumber) {
+		this.logRemainNumber = logRemainNumber;
+	}
+
+	public String getTftpServer() {
+		return tftpServer;
+	}
+
+	public void setTftpServer(String tftpServer) {
+		this.tftpServer = tftpServer;
+	}
+
+	public String getBackupPath() {
+		return backupPath;
+	}
+
+	public void setBackupPath(String backupPath) {
+		this.backupPath = backupPath;
+	}
+
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
+	}
+
+	public int getBackupDays() {
+		return backupDays;
+	}
+
+	public void setBackupDays(int backupDays) {
+		this.backupDays = backupDays;
+	}
+
+	public String getZosIp() {
+		return zosIp;
+	}
+
+	public void setZosIp(String zosIp) {
+		this.zosIp = zosIp;
+	}
+
+	public String getZosPort() {
+		return zosPort;
+	}
+
+	public void setZosPort(String zosPort) {
+		this.zosPort = zosPort;
+	}
+	
+	public String getZlogIp() {
+		return zlogIp;
+	}
+
+	public void setZlogIp(String zlogIp) {
+		this.zlogIp = zlogIp;
+	}
+
+	public String getZlogPort() {
+		return zlogPort;
+	}
+
+	public void setZlogPort(String zlogPort) {
+		this.zlogPort = zlogPort;
+	}
+
+	public String getSchoolBg() {
+		return schoolBg;
+	}
+
+	public void setSchoolBg(String schoolBg) {
+		this.schoolBg = schoolBg;
+	}
+
+	public String getHomeBg() {
+		return homeBg;
+	}
+
+	public void setHomeBg(String homeBg) {
+		this.homeBg = homeBg;
+	}
+
+	public String getTopolBg() {
+		return topolBg;
+	}
+
+	public void setTopolBg(String topolBg) {
+		this.topolBg = topolBg;
+	}
+
+	public String getIndexBg() {
+		return indexBg;
+	}
+
+	public void setIndexBg(String indexBg) {
+		this.indexBg = indexBg;
+	}
+
+}

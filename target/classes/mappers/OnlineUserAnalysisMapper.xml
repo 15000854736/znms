@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.OnlineUserAnalysisMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.OnlineUserAnalysis" >
+    <id column="ONLINE_USER_ANALYSIS_UUID" property="onlineUserAnalysisUuid" jdbcType="VARCHAR" />
+    <result column="USER_TYPE" property="userType" jdbcType="INTEGER" />
+    <result column="USER_COUNT" property="userCount" jdbcType="INTEGER" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ONLINE_USER_ANALYSIS_UUID, USER_TYPE, USER_COUNT, CREATE_TIME
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from ONLINE_USER_ANALYSIS
+    where ONLINE_USER_ANALYSIS_UUID = #{onlineUserAnalysisUuid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findUserCountByCondition" resultType="java.lang.Integer">
+    select USER_COUNT
+    from ONLINE_USER_ANALYSIS
+    where 
+    CREATE_TIME  <![CDATA[ >= ]]> #{startTime,jdbcType=VARCHAR} 
+    and CREATE_TIME <![CDATA[ <= ]]> #{endTime,jdbcType=VARCHAR}
+    and USER_TYPE = #{userType,jdbcType=INTEGER}
+    order by CREATE_TIME DESC
+    limit 1
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from ONLINE_USER_ANALYSIS
+    where ONLINE_USER_ANALYSIS_UUID = #{onlineUserAnalysisUuid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.OnlineUserAnalysis" >
+    insert into ONLINE_USER_ANALYSIS (ONLINE_USER_ANALYSIS_UUID, USER_TYPE, 
+      USER_COUNT, CREATE_TIME)
+    values (#{onlineUserAnalysisUuid,jdbcType=VARCHAR}, #{userType,jdbcType=INTEGER}, 
+      #{userCount,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.OnlineUserAnalysis" >
+    insert into ONLINE_USER_ANALYSIS
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="onlineUserAnalysisUuid != null" >
+        ONLINE_USER_ANALYSIS_UUID,
+      </if>
+      <if test="userType != null" >
+        USER_TYPE,
+      </if>
+      <if test="userCount != null" >
+        USER_COUNT,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="onlineUserAnalysisUuid != null" >
+        #{onlineUserAnalysisUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        #{userType,jdbcType=INTEGER},
+      </if>
+      <if test="userCount != null" >
+        #{userCount,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.OnlineUserAnalysis" >
+    update ONLINE_USER_ANALYSIS
+    <set >
+      <if test="userType != null" >
+        USER_TYPE = #{userType,jdbcType=INTEGER},
+      </if>
+      <if test="userCount != null" >
+        USER_COUNT = #{userCount,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ONLINE_USER_ANALYSIS_UUID = #{onlineUserAnalysisUuid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.OnlineUserAnalysis" >
+    update ONLINE_USER_ANALYSIS
+    set USER_TYPE = #{userType,jdbcType=INTEGER},
+      USER_COUNT = #{userCount,jdbcType=INTEGER},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+    where ONLINE_USER_ANALYSIS_UUID = #{onlineUserAnalysisUuid,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="findByTypeAndTime" resultType="java.lang.Integer">
+  	select count(1) from ONLINE_USER_ANALYSIS
+  	where CREATE_TIME = #{time} and USER_TYPE = #{type}
+  </select>
+  
+  <delete id="deleteExpiredData">
+  	delete from ONLINE_USER_ANALYSIS
+  	where datediff(curdate(), CREATE_TIME)>=2
+  </delete>
+</mapper>

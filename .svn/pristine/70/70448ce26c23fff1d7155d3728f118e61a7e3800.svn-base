@@ -1,0 +1,59 @@
+package info.zznet.znms.spider.util;
+
+import info.zznet.znms.base.common.ZNMSLogger;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class PingUtil {
+    
+    public static boolean isReachable(String ipAddress) throws Exception {
+        int  timeOut =  3000 ;  //超时时间        
+        boolean status = InetAddress.getByName(ipAddress).isReachable(timeOut);    // 当返回值是true时，说明host是可用的，false则不可。
+        return status;
+    }
+    
+    public static boolean ping(String ipAddress) throws Exception {
+        String line = null;
+        BufferedReader buf =null;
+        try {
+            Process pro = Runtime.getRuntime().exec("ping " + ipAddress);
+            buf = new BufferedReader(new InputStreamReader(
+                    pro.getInputStream()));
+            int connectedCount = 0;   
+            while ((line = buf.readLine()) != null){
+            	  connectedCount += getCheckResult(line);   
+            	//ZNMSLogger.info(line);
+            }
+            return connectedCount >=1;  
+        } catch (Exception ex) {
+        	ZNMSLogger.error(ex.getMessage());
+            return false;  
+        } finally {   
+            try {    
+            	buf.close();   
+            } catch (IOException e) {    
+            	ZNMSLogger.error(e); 
+            }  
+        }
+    }
+    //若line含有=18ms TTL=16字样,说明已经ping通,返回1,否則返回0.
+    private static int getCheckResult(String line) {  // System.out.println("控制台输出的结果为:"+line);  
+        Pattern pattern = Pattern.compile("(\\d+ms)(\\s+)(TTL=\\d+)",    Pattern.CASE_INSENSITIVE);  
+        Matcher matcher = pattern.matcher(line);  
+        while (matcher.find()) {
+            return 1;
+        }
+        return 0; 
+    }
+    public static void main(String[] args) throws Exception {
+        String ipAddress = "192.168.1.101";
+       // System.out.println(isReachable(ipAddress));
+        System.out.println(ping(ipAddress));
+        //System.out.println(ping(ipAddress, 5, 5000));
+    }
+}

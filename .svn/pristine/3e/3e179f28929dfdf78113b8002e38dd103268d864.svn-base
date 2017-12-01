@@ -1,0 +1,22 @@
+package info.zznet.znms.base.job;
+
+import info.zznet.znms.base.dao.HostMapper;
+import info.zznet.znms.web.WebRuntimeData;
+
+import org.quartz.DisallowConcurrentExecution;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+@Service
+@DisallowConcurrentExecution
+public class WebRuntimeDataRefreshJob {
+	
+	@Autowired
+	private HostMapper hostMapper;
+	
+	@Scheduled(fixedDelay=60000)
+	public void refreshBadStatusHostCount(){
+		WebRuntimeData.instance.setBadStatusHostCount(hostMapper.getHostCountByWorkStatus(2));
+	}
+}

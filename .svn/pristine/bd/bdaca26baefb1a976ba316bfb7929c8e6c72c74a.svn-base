@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.zznet.znms.base.dao.ApRegionMapper" >
+  <resultMap id="BaseResultMap" type="info.zznet.znms.base.entity.ApRegion" >
+    <id column="AP_REGION_UUID" property="apRegionUuid" jdbcType="VARCHAR" />
+    <result column="AP_REGION_NAME" property="apRegionName" jdbcType="VARCHAR" />
+    <result column="AP_REGION_COORDINATE" property="apRegionCoordinate" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    AP_REGION_UUID, AP_REGION_NAME, AP_REGION_COORDINATE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from AP_REGION
+    where AP_REGION_UUID = #{apRegionUuid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findAllApRegion" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from AP_REGION
+  </select>
+  
+  <select id="findRegionByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select 
+    <include refid="Base_Column_List" />
+    from AP_REGION
+    where AP_REGION_NAME = #{apRegionName,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findRegion" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from AP_REGION
+    <if test="apRegionName != null and apRegionName != ''">
+    	where AP_REGION_NAME like CONCAT('%',#{apRegionName,jdbcType=VARCHAR},'%')
+    </if>
+    limit #{pager.limit} offset #{pager.offset}
+  </select>
+  
+  <select id="getCount" resultType="java.lang.Long" parameterType="java.lang.String">
+    select count(AP_REGION_UUID)
+    <include refid="Base_Column_List" />
+    from AP_REGION
+    <if test="apRegionName != null and apRegionName != ''">
+    	where AP_REGION_NAME like CONCAT('%',#{apRegionName,jdbcType=VARCHAR},'%')
+    </if>
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from AP_REGION
+    where AP_REGION_UUID = #{apRegionUuid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="info.zznet.znms.base.entity.ApRegion" >
+    insert into AP_REGION (AP_REGION_UUID, AP_REGION_NAME, AP_REGION_COORDINATE
+      )
+    values (#{apRegionUuid,jdbcType=VARCHAR}, #{apRegionName,jdbcType=VARCHAR}, #{apRegionCoordinate,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="info.zznet.znms.base.entity.ApRegion" >
+    insert into AP_REGION
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="apRegionUuid != null" >
+        AP_REGION_UUID,
+      </if>
+      <if test="apRegionName != null" >
+        AP_REGION_NAME,
+      </if>
+      <if test="apRegionCoordinate != null" >
+        AP_REGION_COORDINATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="apRegionUuid != null" >
+        #{apRegionUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="apRegionName != null" >
+        #{apRegionName,jdbcType=VARCHAR},
+      </if>
+      <if test="apRegionCoordinate != null" >
+        #{apRegionCoordinate,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="info.zznet.znms.base.entity.ApRegion" >
+    update AP_REGION
+    <set >
+      <if test="apRegionName != null" >
+        AP_REGION_NAME = #{apRegionName,jdbcType=VARCHAR},
+      </if>
+      <if test="apRegionCoordinate != null" >
+        AP_REGION_COORDINATE = #{apRegionCoordinate,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where AP_REGION_UUID = #{apRegionUuid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="info.zznet.znms.base.entity.ApRegion" >
+    update AP_REGION
+    set AP_REGION_NAME = #{apRegionName,jdbcType=VARCHAR},
+      AP_REGION_COORDINATE = #{apRegionCoordinate,jdbcType=VARCHAR}
+    where AP_REGION_UUID = #{apRegionUuid,jdbcType=VARCHAR}
+  </update>
+</mapper>

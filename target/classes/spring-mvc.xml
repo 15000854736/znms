@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+    http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/mvc 
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd"
+	default-autowire="byName" default-lazy-init="true">
+	
+	<!-- 启用spring mvc 注解 -->
+	<mvc:annotation-driven />
+	
+	<!-- 对类进行扫描，以完成Bean创建和自动依赖注入的功能 -->
+	<context:component-scan base-package="info.zznet.znms">
+		<context:exclude-filter type="annotation"
+		expression="org.springframework.stereotype.Service" />
+	</context:component-scan>
+
+	<context:property-placeholder location="classpath:common.properties" ignore-unresolvable="true" />
+
+	<!-- 视图解析器:定义跳转的文件的前后缀 -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/views/" />
+		<property name="suffix" value=".jsp" />
+		<property name="order" value="2" />
+	</bean>
+
+	<bean id="localeChangeInterceptor"
+		class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+		<property name="paramName" value="lang" />
+	</bean>
+
+	<bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+	</bean>
+
+	<!-- annotation默认的方法映射适配器 -->
+	<bean id="handlerMapping"
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="interceptors">
+			<ref bean="localeChangeInterceptor" />
+		</property>
+	</bean>
+
+	<bean id="validator"
+		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="providerClass" value="org.hibernate.validator.HibernateValidator" />
+		<property name="validationMessageSource" ref="messageSource" />
+	</bean>
+
+	<mvc:annotation-driven validator="validator" />
+
+	<!-- 当请求应用程序首页时，将执行/index请求，还可以设定成redirect -->
+	<mvc:view-controller path="/" view-name="forward:/index" />
+		
+	<!--通知spring使用cglib生成代理方法 -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />  
+	
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="mappingJacksonHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="mappingJacksonHttpMessageConverter"
+		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/plain;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 文件上传 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="104857600"/>
+        <property name="maxInMemorySize" value="4096"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+	<mvc:resources mapping="/images/**" location="resource/images/"
+		cache-period="60" />
+	<mvc:resources mapping="/js/**" location="resource/js/"
+		cache-period="60" />
+	<mvc:resources mapping="/css/**" location="resource/css/"
+		cache-period="60" />
+	<mvc:resources mapping="/fonts/**" location="resource/fonts/"
+		cache-period="60" />
+	<mvc:resources mapping="/files/**" location="file:${znms.import.path}"
+	 		cache-period="60" />
+	<mvc:resources mapping="/innerFile/**" location="resource/file/"
+	cache-period="60" />
+	<mvc:resources mapping="/image/**" location="file:${znms.image.path}"
+	cache-period="60" />
+</beans>
